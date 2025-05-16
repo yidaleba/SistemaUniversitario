@@ -12,143 +12,214 @@
 
         private void InitializeComponent()
         {
-            this.comboSemestre = new System.Windows.Forms.ComboBox();
-            this.comboMateria = new System.Windows.Forms.ComboBox();
-            this.comboDia1 = new System.Windows.Forms.ComboBox();
-            this.comboDia2 = new System.Windows.Forms.ComboBox();
-            this.timeInicio1 = new System.Windows.Forms.DateTimePicker();
-            this.timeFin1 = new System.Windows.Forms.DateTimePicker();
-            this.timeInicio2 = new System.Windows.Forms.DateTimePicker();
-            this.timeFin2 = new System.Windows.Forms.DateTimePicker();
-            this.btnGuardar = new System.Windows.Forms.Button();
-            this.dataGridViewHorario = new System.Windows.Forms.DataGridView();
-            this.btnVolver = new System.Windows.Forms.Button();
-
-            this.labelSemestre = new System.Windows.Forms.Label();
-            this.labelMateria = new System.Windows.Forms.Label();
-            this.labelDia1 = new System.Windows.Forms.Label();
-            this.labelDia2 = new System.Windows.Forms.Label();
-            this.labelHoraInicio1 = new System.Windows.Forms.Label();
-            this.labelHoraFin1 = new System.Windows.Forms.Label();
-            this.labelHoraInicio2 = new System.Windows.Forms.Label();
-            this.labelHoraFin2 = new System.Windows.Forms.Label();
-
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridViewHorario)).BeginInit();
-            this.SuspendLayout();
-
-            // Labels
-            this.labelSemestre.Text = "Semestre:";
-            this.labelSemestre.Location = new System.Drawing.Point(20, 20);
-            this.labelSemestre.Size = new System.Drawing.Size(80, 20);
-
-            this.labelMateria.Text = "Materia:";
-            this.labelMateria.Location = new System.Drawing.Point(20, 60);
-            this.labelMateria.Size = new System.Drawing.Size(80, 20);
-
-            this.labelDia1.Text = "Día 1:";
-            this.labelDia1.Location = new System.Drawing.Point(20, 100);
-            this.labelDia1.Size = new System.Drawing.Size(80, 20);
-
-            this.labelHoraInicio1.Text = "Hora inicio:";
-            this.labelHoraInicio1.Location = new System.Drawing.Point(250, 100);
-            this.labelHoraInicio1.Size = new System.Drawing.Size(80, 20);
-
-            this.labelHoraFin1.Text = "Hora fin:";
-            this.labelHoraFin1.Location = new System.Drawing.Point(450, 100);
-            this.labelHoraFin1.Size = new System.Drawing.Size(80, 20);
-
-            this.labelDia2.Text = "Día 2:";
-            this.labelDia2.Location = new System.Drawing.Point(20, 140);
-            this.labelDia2.Size = new System.Drawing.Size(80, 20);
-
-            this.labelHoraInicio2.Text = "Hora inicio:";
-            this.labelHoraInicio2.Location = new System.Drawing.Point(250, 140);
-            this.labelHoraInicio2.Size = new System.Drawing.Size(80, 20);
-
-            this.labelHoraFin2.Text = "Hora fin:";
-            this.labelHoraFin2.Location = new System.Drawing.Point(450, 140);
-            this.labelHoraFin2.Size = new System.Drawing.Size(80, 20);
-
-            // ComboBoxes
-            this.comboSemestre.Location = new System.Drawing.Point(100, 20);
-            this.comboSemestre.Size = new System.Drawing.Size(200, 24);
-
-            this.comboMateria.Location = new System.Drawing.Point(100, 60);
-            this.comboMateria.Size = new System.Drawing.Size(400, 24);
-
-            this.comboDia1.Location = new System.Drawing.Point(100, 100);
-            this.comboDia1.Size = new System.Drawing.Size(140, 24);
-            this.comboDia1.Items.AddRange(new string[] { "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sabado" });
-
-            this.comboDia2.Location = new System.Drawing.Point(100, 140);
-            this.comboDia2.Size = new System.Drawing.Size(140, 24);
-            this.comboDia2.Items.AddRange(new string[] { "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sabado" });
-
-            // TimePickers
-            this.timeInicio1.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.timeInicio1.CustomFormat = "HH:00";
-            this.timeInicio1.ShowUpDown = true;
-            this.timeInicio1.Location = new System.Drawing.Point(330, 100);
-            this.timeInicio1.Width = 100;
-
-            this.timeFin1.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.timeFin1.CustomFormat = "HH:00";
-            this.timeFin1.ShowUpDown = true;
-            this.timeFin1.Location = new System.Drawing.Point(530, 100);
-            this.timeFin1.Width = 100;
-
-            this.timeInicio2.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.timeInicio2.CustomFormat = "HH:00";
-            this.timeInicio2.ShowUpDown = true;
-            this.timeInicio2.Location = new System.Drawing.Point(330, 140);
-            this.timeInicio2.Width = 100;
-
-            this.timeFin2.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.timeFin2.CustomFormat = "HH:00";
-            this.timeFin2.ShowUpDown = true;
-            this.timeFin2.Location = new System.Drawing.Point(530, 140);
-            this.timeFin2.Width = 100;
-
-            // Botón Guardar
-            this.btnGuardar.Text = "Guardar horario";
-            this.btnGuardar.Location = new System.Drawing.Point(650, 120);
-            this.btnGuardar.Size = new System.Drawing.Size(120, 30);
-            this.btnGuardar.Click += new System.EventHandler(this.btnGuardar_Click);
-
-            // Botón Volver
-            this.btnVolver.Text = "Volver";
-            this.btnVolver.Location = new System.Drawing.Point(650, 20);
-            this.btnVolver.Size = new System.Drawing.Size(120, 30);
-            this.btnVolver.Click += new System.EventHandler(this.btnVolver_Click);
-
-            // DataGridView
-            this.dataGridViewHorario.Location = new System.Drawing.Point(20, 200);
-            this.dataGridViewHorario.Size = new System.Drawing.Size(750, 300);
-
-            // Form
-            this.ClientSize = new System.Drawing.Size(800, 520);
-            this.Controls.Add(this.labelSemestre);
-            this.Controls.Add(this.labelMateria);
-            this.Controls.Add(this.labelDia1);
-            this.Controls.Add(this.labelDia2);
-            this.Controls.Add(this.labelHoraInicio1);
-            this.Controls.Add(this.labelHoraFin1);
-            this.Controls.Add(this.labelHoraInicio2);
-            this.Controls.Add(this.labelHoraFin2);
-            this.Controls.Add(this.comboSemestre);
-            this.Controls.Add(this.comboMateria);
-            this.Controls.Add(this.comboDia1);
-            this.Controls.Add(this.comboDia2);
-            this.Controls.Add(this.timeInicio1);
-            this.Controls.Add(this.timeFin1);
-            this.Controls.Add(this.timeInicio2);
-            this.Controls.Add(this.timeFin2);
-            this.Controls.Add(this.btnGuardar);
-            this.Controls.Add(this.btnVolver);
-            this.Controls.Add(this.dataGridViewHorario);
-            this.Text = "Gestión de Horarios";
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridViewHorario)).EndInit();
-            this.ResumeLayout(false);
+            comboSemestre = new ComboBox();
+            comboMateria = new ComboBox();
+            comboDia1 = new ComboBox();
+            comboDia2 = new ComboBox();
+            timeInicio1 = new DateTimePicker();
+            timeFin1 = new DateTimePicker();
+            timeInicio2 = new DateTimePicker();
+            timeFin2 = new DateTimePicker();
+            btnGuardar = new Button();
+            dataGridViewHorario = new DataGridView();
+            btnVolver = new Button();
+            labelSemestre = new Label();
+            labelMateria = new Label();
+            labelDia1 = new Label();
+            labelDia2 = new Label();
+            labelHoraInicio1 = new Label();
+            labelHoraFin1 = new Label();
+            labelHoraInicio2 = new Label();
+            labelHoraFin2 = new Label();
+            ((System.ComponentModel.ISupportInitialize)dataGridViewHorario).BeginInit();
+            SuspendLayout();
+            // 
+            // comboSemestre
+            // 
+            comboSemestre.Location = new Point(100, 20);
+            comboSemestre.Name = "comboSemestre";
+            comboSemestre.Size = new Size(200, 23);
+            comboSemestre.TabIndex = 8;
+            // 
+            // comboMateria
+            // 
+            comboMateria.Location = new Point(100, 60);
+            comboMateria.Name = "comboMateria";
+            comboMateria.Size = new Size(400, 23);
+            comboMateria.TabIndex = 9;
+            // 
+            // comboDia1
+            // 
+            comboDia1.Items.AddRange(new object[] { "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sabado" });
+            comboDia1.Location = new Point(100, 100);
+            comboDia1.Name = "comboDia1";
+            comboDia1.Size = new Size(140, 23);
+            comboDia1.TabIndex = 10;
+            // 
+            // comboDia2
+            // 
+            comboDia2.Items.AddRange(new object[] { "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sabado" });
+            comboDia2.Location = new Point(100, 140);
+            comboDia2.Name = "comboDia2";
+            comboDia2.Size = new Size(140, 23);
+            comboDia2.TabIndex = 11;
+            // 
+            // timeInicio1
+            // 
+            timeInicio1.CustomFormat = "HH:00";
+            timeInicio1.Format = DateTimePickerFormat.Custom;
+            timeInicio1.Location = new Point(330, 100);
+            timeInicio1.Name = "timeInicio1";
+            timeInicio1.ShowUpDown = true;
+            timeInicio1.Size = new Size(100, 23);
+            timeInicio1.TabIndex = 12;
+            // 
+            // timeFin1
+            // 
+            timeFin1.CustomFormat = "HH:00";
+            timeFin1.Format = DateTimePickerFormat.Custom;
+            timeFin1.Location = new Point(530, 100);
+            timeFin1.Name = "timeFin1";
+            timeFin1.ShowUpDown = true;
+            timeFin1.Size = new Size(100, 23);
+            timeFin1.TabIndex = 13;
+            // 
+            // timeInicio2
+            // 
+            timeInicio2.CustomFormat = "HH:00";
+            timeInicio2.Format = DateTimePickerFormat.Custom;
+            timeInicio2.Location = new Point(330, 140);
+            timeInicio2.Name = "timeInicio2";
+            timeInicio2.ShowUpDown = true;
+            timeInicio2.Size = new Size(100, 23);
+            timeInicio2.TabIndex = 14;
+            // 
+            // timeFin2
+            // 
+            timeFin2.CustomFormat = "HH:00";
+            timeFin2.Format = DateTimePickerFormat.Custom;
+            timeFin2.Location = new Point(530, 140);
+            timeFin2.Name = "timeFin2";
+            timeFin2.ShowUpDown = true;
+            timeFin2.Size = new Size(100, 23);
+            timeFin2.TabIndex = 15;
+            // 
+            // btnGuardar
+            // 
+            btnGuardar.Location = new Point(650, 120);
+            btnGuardar.Name = "btnGuardar";
+            btnGuardar.Size = new Size(120, 30);
+            btnGuardar.TabIndex = 16;
+            btnGuardar.Text = "Guardar horario";
+            btnGuardar.Click += btnGuardar_Click;
+            // 
+            // dataGridViewHorario
+            // 
+            dataGridViewHorario.Location = new Point(20, 200);
+            dataGridViewHorario.Name = "dataGridViewHorario";
+            dataGridViewHorario.Size = new Size(750, 300);
+            dataGridViewHorario.TabIndex = 18;
+            dataGridViewHorario.CellContentClick += dataGridViewHorario_CellContentClick;
+            // 
+            // btnVolver
+            // 
+            btnVolver.Location = new Point(650, 20);
+            btnVolver.Name = "btnVolver";
+            btnVolver.Size = new Size(120, 30);
+            btnVolver.TabIndex = 17;
+            btnVolver.Text = "Volver";
+            btnVolver.Click += btnVolver_Click;
+            // 
+            // labelSemestre
+            // 
+            labelSemestre.Location = new Point(20, 20);
+            labelSemestre.Name = "labelSemestre";
+            labelSemestre.Size = new Size(80, 20);
+            labelSemestre.TabIndex = 0;
+            labelSemestre.Text = "Semestre:";
+            // 
+            // labelMateria
+            // 
+            labelMateria.Location = new Point(20, 60);
+            labelMateria.Name = "labelMateria";
+            labelMateria.Size = new Size(80, 20);
+            labelMateria.TabIndex = 1;
+            labelMateria.Text = "Materia:";
+            // 
+            // labelDia1
+            // 
+            labelDia1.Location = new Point(20, 100);
+            labelDia1.Name = "labelDia1";
+            labelDia1.Size = new Size(80, 20);
+            labelDia1.TabIndex = 2;
+            labelDia1.Text = "Día 1:";
+            // 
+            // labelDia2
+            // 
+            labelDia2.Location = new Point(20, 140);
+            labelDia2.Name = "labelDia2";
+            labelDia2.Size = new Size(80, 20);
+            labelDia2.TabIndex = 3;
+            labelDia2.Text = "Día 2:";
+            // 
+            // labelHoraInicio1
+            // 
+            labelHoraInicio1.Location = new Point(250, 100);
+            labelHoraInicio1.Name = "labelHoraInicio1";
+            labelHoraInicio1.Size = new Size(80, 20);
+            labelHoraInicio1.TabIndex = 4;
+            labelHoraInicio1.Text = "Hora inicio:";
+            // 
+            // labelHoraFin1
+            // 
+            labelHoraFin1.Location = new Point(450, 100);
+            labelHoraFin1.Name = "labelHoraFin1";
+            labelHoraFin1.Size = new Size(80, 20);
+            labelHoraFin1.TabIndex = 5;
+            labelHoraFin1.Text = "Hora fin:";
+            // 
+            // labelHoraInicio2
+            // 
+            labelHoraInicio2.Location = new Point(250, 140);
+            labelHoraInicio2.Name = "labelHoraInicio2";
+            labelHoraInicio2.Size = new Size(80, 20);
+            labelHoraInicio2.TabIndex = 6;
+            labelHoraInicio2.Text = "Hora inicio:";
+            // 
+            // labelHoraFin2
+            // 
+            labelHoraFin2.Location = new Point(450, 140);
+            labelHoraFin2.Name = "labelHoraFin2";
+            labelHoraFin2.Size = new Size(80, 20);
+            labelHoraFin2.TabIndex = 7;
+            labelHoraFin2.Text = "Hora fin:";
+            // 
+            // Form5
+            // 
+            ClientSize = new Size(800, 520);
+            Controls.Add(labelSemestre);
+            Controls.Add(labelMateria);
+            Controls.Add(labelDia1);
+            Controls.Add(labelDia2);
+            Controls.Add(labelHoraInicio1);
+            Controls.Add(labelHoraFin1);
+            Controls.Add(labelHoraInicio2);
+            Controls.Add(labelHoraFin2);
+            Controls.Add(comboSemestre);
+            Controls.Add(comboMateria);
+            Controls.Add(comboDia1);
+            Controls.Add(comboDia2);
+            Controls.Add(timeInicio1);
+            Controls.Add(timeFin1);
+            Controls.Add(timeInicio2);
+            Controls.Add(timeFin2);
+            Controls.Add(btnGuardar);
+            Controls.Add(btnVolver);
+            Controls.Add(dataGridViewHorario);
+            Name = "Form5";
+            Text = "Gestión de Horarios";
+            ((System.ComponentModel.ISupportInitialize)dataGridViewHorario).EndInit();
+            ResumeLayout(false);
         }
 
         private System.Windows.Forms.ComboBox comboSemestre;

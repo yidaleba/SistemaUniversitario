@@ -233,5 +233,10 @@ namespace UniversidadApp
 
             public override string ToString() => Text;
         }
+
+        private void dataGridViewHorario_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
     }
 }

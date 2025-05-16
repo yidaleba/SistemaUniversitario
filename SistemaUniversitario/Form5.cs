@@ -13,6 +13,7 @@ namespace UniversidadApp
         public Form5()
         {
             InitializeComponent();
+            this.FormClosed += (s, e) => Application.Exit();
             conexion = new SQLiteConnection("Data Source=universidad.db;Version=3;");
             conexion.Open();
 

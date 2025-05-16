@@ -15,6 +15,7 @@
         private System.Windows.Forms.CheckBox checkLaboratorio;
         private System.Windows.Forms.Button btnGuardar;
         private System.Windows.Forms.Label lblSemestre;
+        private System.Windows.Forms.Button btnVolver;
 
         protected override void Dispose(bool disposing)
         {
@@ -27,94 +28,151 @@
 
         private void InitializeComponent()
         {
-            this.dataGridViewMaterias = new System.Windows.Forms.DataGridView();
-            this.comboSemestre = new System.Windows.Forms.ComboBox();
-            this.btnAgregar = new System.Windows.Forms.Button();
-            this.panelAgregarMateria = new System.Windows.Forms.Panel();
-            this.txtNombre = new System.Windows.Forms.TextBox();
-            this.txtSemestre = new System.Windows.Forms.TextBox();
-            this.txtCodigo = new System.Windows.Forms.TextBox();
-            this.txtHoras = new System.Windows.Forms.TextBox();
-            this.checkMesas = new System.Windows.Forms.CheckBox();
-            this.checkLaboratorio = new System.Windows.Forms.CheckBox();
-            this.btnGuardar = new System.Windows.Forms.Button();
-            this.lblSemestre = new System.Windows.Forms.Label();
-
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridViewMaterias)).BeginInit();
-            this.panelAgregarMateria.SuspendLayout();
-            this.SuspendLayout();
-
+            dataGridViewMaterias = new DataGridView();
+            comboSemestre = new ComboBox();
+            btnAgregar = new Button();
+            panelAgregarMateria = new Panel();
+            txtNombre = new TextBox();
+            txtSemestre = new TextBox();
+            txtCodigo = new TextBox();
+            txtHoras = new TextBox();
+            checkMesas = new CheckBox();
+            checkLaboratorio = new CheckBox();
+            btnGuardar = new Button();
+            lblSemestre = new Label();
+            btnVolver = new Button();
+            ((System.ComponentModel.ISupportInitialize)dataGridViewMaterias).BeginInit();
+            panelAgregarMateria.SuspendLayout();
+            SuspendLayout();
+            // 
             // dataGridViewMaterias
-            this.dataGridViewMaterias.Location = new System.Drawing.Point(12, 50);
-            this.dataGridViewMaterias.Size = new System.Drawing.Size(760, 250);
-            this.dataGridViewMaterias.TabIndex = 0;
-
+            // 
+            dataGridViewMaterias.Location = new Point(12, 50);
+            dataGridViewMaterias.Name = "dataGridViewMaterias";
+            dataGridViewMaterias.Size = new Size(760, 250);
+            dataGridViewMaterias.TabIndex = 0;
+            // 
             // comboSemestre
-            this.comboSemestre.Location = new System.Drawing.Point(100, 15);
-            this.comboSemestre.Size = new System.Drawing.Size(121, 21);
-            this.comboSemestre.SelectedIndexChanged += new System.EventHandler(this.comboSemestre_SelectedIndexChanged);
-
+            // 
+            comboSemestre.Location = new Point(100, 15);
+            comboSemestre.Name = "comboSemestre";
+            comboSemestre.Size = new Size(121, 23);
+            comboSemestre.TabIndex = 1;
+            comboSemestre.SelectedIndexChanged += comboSemestre_SelectedIndexChanged;
+            // 
             // btnAgregar
-            this.btnAgregar.Location = new System.Drawing.Point(240, 13);
-            this.btnAgregar.Text = "Agregar Materia";
-            this.btnAgregar.Click += new System.EventHandler(this.btnAgregar_Click);
-
+            // 
+            btnAgregar.Location = new Point(240, 13);
+            btnAgregar.Name = "btnAgregar";
+            btnAgregar.Size = new Size(75, 23);
+            btnAgregar.TabIndex = 2;
+            btnAgregar.Text = "Agregar Materia";
+            btnAgregar.Click += btnAgregar_Click;
+            // 
             // panelAgregarMateria
-            this.panelAgregarMateria.Controls.Add(this.txtNombre);
-            this.panelAgregarMateria.Controls.Add(this.txtSemestre);
-            this.panelAgregarMateria.Controls.Add(this.txtCodigo);
-            this.panelAgregarMateria.Controls.Add(this.txtHoras);
-            this.panelAgregarMateria.Controls.Add(this.checkMesas);
-            this.panelAgregarMateria.Controls.Add(this.checkLaboratorio);
-            this.panelAgregarMateria.Controls.Add(this.btnGuardar);
-            this.panelAgregarMateria.Location = new System.Drawing.Point(12, 310);
-            this.panelAgregarMateria.Size = new System.Drawing.Size(400, 150);
-            this.panelAgregarMateria.TabIndex = 1;
-
+            // 
+            panelAgregarMateria.Controls.Add(txtNombre);
+            panelAgregarMateria.Controls.Add(txtSemestre);
+            panelAgregarMateria.Controls.Add(txtCodigo);
+            panelAgregarMateria.Controls.Add(txtHoras);
+            panelAgregarMateria.Controls.Add(checkMesas);
+            panelAgregarMateria.Controls.Add(checkLaboratorio);
+            panelAgregarMateria.Controls.Add(btnGuardar);
+            panelAgregarMateria.Location = new Point(12, 310);
+            panelAgregarMateria.Name = "panelAgregarMateria";
+            panelAgregarMateria.Size = new Size(400, 150);
+            panelAgregarMateria.TabIndex = 1;
+            // 
             // txtNombre
-            this.txtNombre.Location = new System.Drawing.Point(10, 10);
-            this.txtNombre.PlaceholderText = "Nombre";
-
+            // 
+            txtNombre.Location = new Point(10, 10);
+            txtNombre.Name = "txtNombre";
+            txtNombre.PlaceholderText = "Nombre";
+            txtNombre.Size = new Size(100, 23);
+            txtNombre.TabIndex = 0;
+            // 
             // txtSemestre
-            this.txtSemestre.Location = new System.Drawing.Point(10, 40);
-            this.txtSemestre.PlaceholderText = "Semestre";
-
+            // 
+            txtSemestre.Location = new Point(10, 40);
+            txtSemestre.Name = "txtSemestre";
+            txtSemestre.PlaceholderText = "Semestre";
+            txtSemestre.Size = new Size(100, 23);
+            txtSemestre.TabIndex = 1;
+            // 
             // txtCodigo
-            this.txtCodigo.Location = new System.Drawing.Point(10, 70);
-            this.txtCodigo.PlaceholderText = "Código";
-
+            // 
+            txtCodigo.Location = new Point(10, 70);
+            txtCodigo.Name = "txtCodigo";
+            txtCodigo.PlaceholderText = "Código";
+            txtCodigo.Size = new Size(100, 23);
+            txtCodigo.TabIndex = 2;
+            // 
             // txtHoras
-            this.txtHoras.Location = new System.Drawing.Point(10, 100);
-            this.txtHoras.PlaceholderText = "Horas";
-
+            // 
+            txtHoras.Location = new Point(10, 100);
+            txtHoras.Name = "txtHoras";
+            txtHoras.PlaceholderText = "Horas";
+            txtHoras.Size = new Size(100, 23);
+            txtHoras.TabIndex = 3;
+            // 
             // checkMesas
-            this.checkMesas.Location = new System.Drawing.Point(150, 10);
-            this.checkMesas.Text = "Mesas";
-            this.checkMesas.CheckedChanged += new System.EventHandler(this.checkMesas_CheckedChanged);
-
+            // 
+            checkMesas.Location = new Point(150, 10);
+            checkMesas.Name = "checkMesas";
+            checkMesas.Size = new Size(104, 24);
+            checkMesas.TabIndex = 4;
+            checkMesas.Text = "Mesas";
+            checkMesas.CheckedChanged += checkMesas_CheckedChanged;
+            // 
             // checkLaboratorio
-            this.checkLaboratorio.Location = new System.Drawing.Point(150, 40);
-            this.checkLaboratorio.Text = "Laboratorio";
-            this.checkLaboratorio.CheckedChanged += new System.EventHandler(this.checkLaboratorio_CheckedChanged);
-
+            // 
+            checkLaboratorio.Location = new Point(150, 40);
+            checkLaboratorio.Name = "checkLaboratorio";
+            checkLaboratorio.Size = new Size(104, 24);
+            checkLaboratorio.TabIndex = 5;
+            checkLaboratorio.Text = "Laboratorio";
+            checkLaboratorio.CheckedChanged += checkLaboratorio_CheckedChanged;
+            // 
             // btnGuardar
-            this.btnGuardar.Location = new System.Drawing.Point(150, 80);
-            this.btnGuardar.Text = "Guardar";
-            this.btnGuardar.Click += new System.EventHandler(this.btnGuardar_Click);
-
+            // 
+            btnGuardar.Location = new Point(150, 80);
+            btnGuardar.Name = "btnGuardar";
+            btnGuardar.Size = new Size(75, 23);
+            btnGuardar.TabIndex = 6;
+            btnGuardar.Text = "Guardar";
+            btnGuardar.Click += btnGuardar_Click;
+            // 
+            // lblSemestre
+            // 
+            lblSemestre.Location = new Point(0, 0);
+            lblSemestre.Name = "lblSemestre";
+            lblSemestre.Size = new Size(100, 23);
+            lblSemestre.TabIndex = 0;
+            // 
+            // btnVolver
+            // 
+            btnVolver.Location = new Point(655, 15);
+            btnVolver.Name = "btnVolver";
+            btnVolver.Size = new Size(100, 30);
+            btnVolver.TabIndex = 0;
+            btnVolver.Text = "Volver";
+            btnVolver.UseVisualStyleBackColor = true;
+            btnVolver.Click += btnVolver_Click;
+            // 
             // Form4
-            this.ClientSize = new System.Drawing.Size(784, 481);
-            this.Controls.Add(this.dataGridViewMaterias);
-            this.Controls.Add(this.comboSemestre);
-            this.Controls.Add(this.btnAgregar);
-            this.Controls.Add(this.panelAgregarMateria);
-            this.Name = "Form4";
-            this.Text = "Gestión de Materias";
-
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridViewMaterias)).EndInit();
-            this.panelAgregarMateria.ResumeLayout(false);
-            this.panelAgregarMateria.PerformLayout();
-            this.ResumeLayout(false);
+            // 
+            ClientSize = new Size(784, 481);
+            Controls.Add(btnVolver);
+            Controls.Add(dataGridViewMaterias);
+            Controls.Add(comboSemestre);
+            Controls.Add(btnAgregar);
+            Controls.Add(panelAgregarMateria);
+            Name = "Form4";
+            Text = "Gestión de Materias";
+            ((System.ComponentModel.ISupportInitialize)dataGridViewMaterias).EndInit();
+            panelAgregarMateria.ResumeLayout(false);
+            panelAgregarMateria.PerformLayout();
+            ResumeLayout(false);
         }
     }
 }

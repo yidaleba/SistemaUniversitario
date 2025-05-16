@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SistemaUniversitario;
+using System;
 using System.Data;
 using System.Data.SQLite;
 using System.Linq;
@@ -116,6 +117,13 @@ namespace UniversidadApp
                 }
             }
         }
+        private void btnVolver_Click(object sender, EventArgs e)
+        {
+            this.Hide();
+            Form3 form3 = new Form3();
+            form3.Show();
+        }
+
 
         private void btnAgregar_Click(object sender, EventArgs e)
         {

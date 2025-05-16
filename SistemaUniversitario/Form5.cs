@@ -13,12 +13,12 @@ namespace UniversidadApp
         public Form5()
         {
             InitializeComponent();
-            this.FormClosed += (s, e) => Application.Exit();
             conexion = new SQLiteConnection("Data Source=universidad.db;Version=3;");
             conexion.Open();
 
             CrearTablaHorariosSiNoExiste();
             CargarSemestres();
+            MostrarHorario();
         }
 
         private void CrearTablaHorariosSiNoExiste()
@@ -39,7 +39,6 @@ namespace UniversidadApp
             comboSemestre.Items.Clear();
             for (int i = 1; i <= 10; i++)
                 comboSemestre.Items.Add(i.ToString());
-
             comboSemestre.SelectedIndexChanged += ComboSemestre_SelectedIndexChanged;
         }
 
@@ -89,6 +88,12 @@ namespace UniversidadApp
                 return;
             }
 
+            if (dia1 == dia2)
+            {
+                MessageBox.Show("Los días seleccionados no pueden ser iguales.");
+                return;
+            }
+
             double totalHoras = CalcularHoras(horaInicio1, horaFin1);
             if (!string.IsNullOrWhiteSpace(dia2))
                 totalHoras += CalcularHoras(horaInicio2, horaFin2);
@@ -100,12 +105,31 @@ namespace UniversidadApp
                 return;
             }
 
+            if (HayConflictoHorario(dia1, horaInicio1, horaFin1) ||
+                (!string.IsNullOrWhiteSpace(dia2) && HayConflictoHorario(dia2, horaInicio2, horaFin2)))
+            {
+                MessageBox.Show("Existe un conflicto de horario con otra materia.");
+                return;
+            }
+
             GuardarHorario(materiaId, dia1, horaInicio1, horaFin1);
             if (!string.IsNullOrWhiteSpace(dia2))
                 GuardarHorario(materiaId, dia2, horaInicio2, horaFin2);
 
             MessageBox.Show("Horario guardado correctamente.");
             MostrarHorario();
+        }
+
+        private bool HayConflictoHorario(string dia, string inicio, string fin)
+        {
+            string query = @"SELECT COUNT(*) FROM Horarios WHERE Dia = @dia 
+                             AND ((@inicio < HoraFin AND @fin > HoraInicio))";
+            using var cmd = new SQLiteCommand(query, conexion);
+            cmd.Parameters.AddWithValue("@dia", dia);
+            cmd.Parameters.AddWithValue("@inicio", inicio);
+            cmd.Parameters.AddWithValue("@fin", fin);
+
+            return Convert.ToInt32(cmd.ExecuteScalar()) > 0;
         }
 
         private int ObtenerHorasMateria(int materiaId)
@@ -159,7 +183,6 @@ namespace UniversidadApp
                              FROM Horarios h
                              INNER JOIN Materias m ON h.MateriaId = m.Id
                              WHERE m.Semestre = @semestre";
-
             using var cmd = new SQLiteCommand(query, conexion);
             cmd.Parameters.AddWithValue("@semestre", comboSemestre.SelectedItem.ToString());
 
@@ -171,16 +194,16 @@ namespace UniversidadApp
                 string fin = reader["HoraFin"].ToString();
                 string nombre = reader["Nombre"].ToString();
 
-                if (TimeSpan.TryParse(inicio, out TimeSpan hi) && TimeSpan.TryParse(fin, out TimeSpan hf))
+                int hi = TimeSpan.Parse(inicio).Hours;
+                int hf = TimeSpan.Parse(fin).Hours;
+
+                for (int h = hi; h < hf; h++)
                 {
-                    for (int h = hi.Hours; h < hf.Hours; h++)
+                    foreach (DataRow row in dt.Rows)
                     {
-                        foreach (DataRow row in dt.Rows)
+                        if (row["Hora"].ToString().StartsWith($"{h}:"))
                         {
-                            if (row["Hora"].ToString().StartsWith($"{h}:"))
-                            {
-                                row[dia] = nombre;
-                            }
+                            row[dia] = nombre;
                         }
                     }
                 }
@@ -192,9 +215,9 @@ namespace UniversidadApp
 
         private void btnVolver_Click(object sender, EventArgs e)
         {
-            this.Hide();
-            Form3 f3 = new Form3();
-            f3.Show();
+            Form3 form3 = new Form3();
+            form3.Show();
+            this.Close();
         }
 
         private class ComboBoxItem

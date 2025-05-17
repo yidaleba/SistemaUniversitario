@@ -16,6 +16,8 @@
         private System.Windows.Forms.Button btnGuardar;
         private System.Windows.Forms.Label lblSemestre;
         private System.Windows.Forms.Button btnVolver;
+        private System.Windows.Forms.Button btnGuardarCambios;
+
 
         protected override void Dispose(bool disposing)
         {
@@ -41,6 +43,7 @@
             btnGuardar = new Button();
             lblSemestre = new Label();
             btnVolver = new Button();
+            btnGuardarCambios = new Button();
             ((System.ComponentModel.ISupportInitialize)dataGridViewMaterias).BeginInit();
             panelAgregarMateria.SuspendLayout();
             SuspendLayout();
@@ -159,9 +162,20 @@
             btnVolver.UseVisualStyleBackColor = true;
             btnVolver.Click += btnVolver_Click;
             // 
+            // btnGuardarCambios
+            // 
+            btnGuardarCambios.Location = new Point(500, 15);
+            btnGuardarCambios.Name = "btnGuardarCambios";
+            btnGuardarCambios.Size = new Size(130, 30);
+            btnGuardarCambios.TabIndex = 0;
+            btnGuardarCambios.Text = "Guardar Cambios";
+            btnGuardarCambios.UseVisualStyleBackColor = true;
+            btnGuardarCambios.Click += btnGuardarCambios_Click;
+            // 
             // Form4
             // 
             ClientSize = new Size(784, 481);
+            Controls.Add(btnGuardarCambios);
             Controls.Add(btnVolver);
             Controls.Add(dataGridViewMaterias);
             Controls.Add(comboSemestre);

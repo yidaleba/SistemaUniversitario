@@ -33,6 +33,10 @@
             labelHoraFin2 = new Label();
             ((System.ComponentModel.ISupportInitialize)dataGridViewHorario).BeginInit();
             SuspendLayout();
+
+            //
+        
+
             // 
             // comboSemestre
             // 

@@ -51,6 +51,50 @@ namespace UniversidadApp
             comboSemestre.SelectedIndex = 0;
         }
 
+        private void btnGuardarCambios_Click(object sender, EventArgs e)
+        {
+            using var conexion = new SQLiteConnection("Data Source=universidad.db;Version=3;");
+            conexion.Open();
+
+            foreach (DataGridViewRow row in dataGridViewMaterias.Rows)
+            {
+                if (row.IsNewRow) continue;
+
+                try
+                {
+                    int id = Convert.ToInt32(row.Cells["Id"].Value);
+                    string nombre = row.Cells["Nombre"].Value?.ToString() ?? "";
+                    int semestre = Convert.ToInt32(row.Cells["Semestre"].Value);
+                    string codigo = row.Cells["Código"].Value?.ToString() ?? "";
+                    int horas = Convert.ToInt32(row.Cells["Horas"].Value);
+                    int mesas = Convert.ToBoolean(row.Cells["Mesas"].Value) ? 1 : 0;
+                    int lab = Convert.ToBoolean(row.Cells["Laboratorio"].Value) ? 1 : 0;
+
+                    string updateQuery = @"UPDATE Materias 
+                                           SET Nombre = @nombre, Semestre = @semestre, Codigo = @codigo, Horas = @horas, Mesas = @mesas, Laboratorio = @lab
+                                           WHERE Id = @id";
+
+                    using var cmd = new SQLiteCommand(updateQuery, conexion);
+                    cmd.Parameters.AddWithValue("@nombre", nombre);
+                    cmd.Parameters.AddWithValue("@semestre", semestre);
+                    cmd.Parameters.AddWithValue("@codigo", codigo);
+                    cmd.Parameters.AddWithValue("@horas", horas);
+                    cmd.Parameters.AddWithValue("@mesas", mesas);
+                    cmd.Parameters.AddWithValue("@lab", lab);
+                    cmd.Parameters.AddWithValue("@id", id);
+
+                    cmd.ExecuteNonQuery();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error al guardar fila: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+
+            MessageBox.Show("Cambios guardados correctamente.");
+            MostrarMaterias(); // Refrescar la tabla
+        }
+
         private void MostrarMaterias()
         {
             string filtro = comboSemestre.SelectedIndex <= 0 ? "" : $"WHERE Semestre = {comboSemestre.SelectedItem}";
@@ -63,10 +107,18 @@ namespace UniversidadApp
             dataGridViewMaterias.Columns.Clear();
             dataGridViewMaterias.AutoGenerateColumns = false;
 
-            dataGridViewMaterias.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Nombre", DataPropertyName = "Nombre" });
-            dataGridViewMaterias.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Semestre", DataPropertyName = "Semestre" });
-            dataGridViewMaterias.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Código", DataPropertyName = "Codigo" });
-            dataGridViewMaterias.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Horas", DataPropertyName = "Horas" });
+            dataGridViewMaterias.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                HeaderText = "Id",
+                DataPropertyName = "Id",
+                Name = "Id",
+                Visible = false
+            });
+
+            dataGridViewMaterias.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Nombre", DataPropertyName = "Nombre", Name = "Nombre" });
+            dataGridViewMaterias.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Semestre", DataPropertyName = "Semestre", Name = "Semestre" });
+            dataGridViewMaterias.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Código", DataPropertyName = "Codigo", Name = "Código" });
+            dataGridViewMaterias.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Horas", DataPropertyName = "Horas", Name = "Horas" });
 
             dataGridViewMaterias.Columns.Add(new DataGridViewCheckBoxColumn
             {
@@ -117,13 +169,13 @@ namespace UniversidadApp
                 }
             }
         }
+
         private void btnVolver_Click(object sender, EventArgs e)
         {
             this.Hide();
             Form3 form3 = new Form3();
             form3.Show();
         }
-
 
         private void btnAgregar_Click(object sender, EventArgs e)
         {

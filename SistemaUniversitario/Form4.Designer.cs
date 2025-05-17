@@ -57,9 +57,9 @@
             // 
             // comboSemestre
             // 
-            comboSemestre.Location = new Point(100, 15);
+            comboSemestre.Location = new Point(69, 15);
             comboSemestre.Name = "comboSemestre";
-            comboSemestre.Size = new Size(121, 23);
+            comboSemestre.Size = new Size(152, 23);
             comboSemestre.TabIndex = 1;
             comboSemestre.SelectedIndexChanged += comboSemestre_SelectedIndexChanged;
             // 
@@ -67,9 +67,9 @@
             // 
             btnAgregar.Location = new Point(240, 13);
             btnAgregar.Name = "btnAgregar";
-            btnAgregar.Size = new Size(75, 23);
+            btnAgregar.Size = new Size(172, 23);
             btnAgregar.TabIndex = 2;
-            btnAgregar.Text = "Agregar Materia";
+            btnAgregar.Text = "Agregar Nueva Materia";
             btnAgregar.Click += btnAgregar_Click;
             // 
             // panelAgregarMateria
@@ -164,11 +164,11 @@
             // 
             // btnGuardarCambios
             // 
-            btnGuardarCambios.Location = new Point(500, 15);
+            btnGuardarCambios.Location = new Point(591, 306);
             btnGuardarCambios.Name = "btnGuardarCambios";
-            btnGuardarCambios.Size = new Size(130, 30);
+            btnGuardarCambios.Size = new Size(181, 30);
             btnGuardarCambios.TabIndex = 0;
-            btnGuardarCambios.Text = "Guardar Cambios";
+            btnGuardarCambios.Text = "Guardar Cambios de la tabla";
             btnGuardarCambios.UseVisualStyleBackColor = true;
             btnGuardarCambios.Click += btnGuardarCambios_Click;
             // 

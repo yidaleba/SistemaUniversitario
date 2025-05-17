@@ -45,7 +45,7 @@ namespace UniversidadApp
         private void CargarComboSemestres()
         {
             comboSemestre.Items.Clear();
-            comboSemestre.Items.Add("Todos");
+            comboSemestre.Items.Add("Todos los semestres");
             for (int i = 1; i <= 10; i++)
                 comboSemestre.Items.Add(i.ToString());
             comboSemestre.SelectedIndex = 0;

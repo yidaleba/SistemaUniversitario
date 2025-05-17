@@ -15,7 +15,7 @@ namespace UniversidadApp
             InitializeComponent();
             conexion = new SQLiteConnection("Data Source=universidad.db;Version=3;");
             conexion.Open();
-
+            this.FormClosed += (s, e) => Application.Exit();
             CrearTablaHorariosSiNoExiste();
             CargarSemestres();
             MostrarHorario();

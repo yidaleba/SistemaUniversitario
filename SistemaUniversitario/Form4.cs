@@ -24,7 +24,6 @@ namespace UniversidadApp
             MostrarMaterias();
             panelAgregarMateria.Visible = false;
 
-            dataGridViewMaterias.CellValueChanged += DataGridViewMaterias_CellValueChanged;
             dataGridViewMaterias.CurrentCellDirtyStateChanged += DataGridViewMaterias_CurrentCellDirtyStateChanged;
         }
 
@@ -35,9 +34,7 @@ namespace UniversidadApp
                 Nombre TEXT,
                 Semestre INTEGER,
                 Codigo TEXT,
-                Horas INTEGER,
-                Mesas INTEGER,
-                Laboratorio INTEGER
+                Horas INTEGER
             )";
             new SQLiteCommand(query, conexion).ExecuteNonQuery();
         }
@@ -67,20 +64,16 @@ namespace UniversidadApp
                     int semestre = Convert.ToInt32(row.Cells["Semestre"].Value);
                     string codigo = row.Cells["Código"].Value?.ToString() ?? "";
                     int horas = Convert.ToInt32(row.Cells["Horas"].Value);
-                    int mesas = Convert.ToBoolean(row.Cells["Mesas"].Value) ? 1 : 0;
-                    int lab = Convert.ToBoolean(row.Cells["Laboratorio"].Value) ? 1 : 0;
 
                     string updateQuery = @"UPDATE Materias 
-                                           SET Nombre = @nombre, Semestre = @semestre, Codigo = @codigo, Horas = @horas, Mesas = @mesas, Laboratorio = @lab
-                                           WHERE Id = @id";
+                                        SET Nombre = @nombre, Semestre = @semestre, Codigo = @codigo, Horas = @horas
+                                        WHERE Id = @id";
 
                     using var cmd = new SQLiteCommand(updateQuery, conexion);
                     cmd.Parameters.AddWithValue("@nombre", nombre);
                     cmd.Parameters.AddWithValue("@semestre", semestre);
                     cmd.Parameters.AddWithValue("@codigo", codigo);
                     cmd.Parameters.AddWithValue("@horas", horas);
-                    cmd.Parameters.AddWithValue("@mesas", mesas);
-                    cmd.Parameters.AddWithValue("@lab", lab);
                     cmd.Parameters.AddWithValue("@id", id);
 
                     cmd.ExecuteNonQuery();
@@ -97,8 +90,19 @@ namespace UniversidadApp
 
         private void MostrarMaterias()
         {
-            string filtro = comboSemestre.SelectedIndex <= 0 ? "" : $"WHERE Semestre = {comboSemestre.SelectedItem}";
-            string query = $"SELECT * FROM Materias {filtro}";
+            string filtroSemestre = comboSemestre.SelectedIndex <= 0 ? "" : $"Semestre = {comboSemestre.SelectedItem}";
+            string filtroNombre = string.IsNullOrWhiteSpace(txtFiltroMateria.Text) ? "" : $"Nombre LIKE '%{txtFiltroMateria.Text}%'";
+
+            string where = "";
+
+            if (!string.IsNullOrEmpty(filtroSemestre) && !string.IsNullOrEmpty(filtroNombre))
+                where = $"WHERE {filtroSemestre} AND {filtroNombre}";
+            else if (!string.IsNullOrEmpty(filtroSemestre))
+                where = $"WHERE {filtroSemestre}";
+            else if (!string.IsNullOrEmpty(filtroNombre))
+                where = $"WHERE {filtroNombre}";
+
+            string query = $"SELECT * FROM Materias {where}";
 
             var adaptador = new SQLiteDataAdapter(query, conexion);
             var tabla = new DataTable();
@@ -120,20 +124,6 @@ namespace UniversidadApp
             dataGridViewMaterias.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Código", DataPropertyName = "Codigo", Name = "Código" });
             dataGridViewMaterias.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Horas", DataPropertyName = "Horas", Name = "Horas" });
 
-            dataGridViewMaterias.Columns.Add(new DataGridViewCheckBoxColumn
-            {
-                HeaderText = "Mesas",
-                DataPropertyName = "Mesas",
-                Name = "Mesas"
-            });
-
-            dataGridViewMaterias.Columns.Add(new DataGridViewCheckBoxColumn
-            {
-                HeaderText = "Laboratorio",
-                DataPropertyName = "Laboratorio",
-                Name = "Laboratorio"
-            });
-
             dataGridViewMaterias.DataSource = tabla;
         }
 
@@ -145,30 +135,7 @@ namespace UniversidadApp
             }
         }
 
-        private void DataGridViewMaterias_CellValueChanged(object sender, DataGridViewCellEventArgs e)
-        {
-            if (e.RowIndex >= 0)
-            {
-                var row = dataGridViewMaterias.Rows[e.RowIndex];
 
-                if (dataGridViewMaterias.Columns[e.ColumnIndex].Name == "Mesas")
-                {
-                    bool isChecked = Convert.ToBoolean(row.Cells["Mesas"].Value);
-                    if (isChecked)
-                    {
-                        row.Cells["Laboratorio"].Value = false;
-                    }
-                }
-                else if (dataGridViewMaterias.Columns[e.ColumnIndex].Name == "Laboratorio")
-                {
-                    bool isChecked = Convert.ToBoolean(row.Cells["Laboratorio"].Value);
-                    if (isChecked)
-                    {
-                        row.Cells["Mesas"].Value = false;
-                    }
-                }
-            }
-        }
 
         private void btnVolver_Click(object sender, EventArgs e)
         {
@@ -188,19 +155,16 @@ namespace UniversidadApp
             int semestre = int.Parse(txtSemestre.Text);
             string codigo = txtCodigo.Text;
             int horas = int.Parse(txtHoras.Text);
-            int mesas = checkMesas.Checked ? 1 : 0;
-            int lab = checkLaboratorio.Checked ? 1 : 0;
 
-            string insert = "INSERT INTO Materias (Nombre, Semestre, Codigo, Horas, Mesas, Laboratorio) " +
-                            "VALUES (@nombre, @semestre, @codigo, @horas, @mesas, @lab)";
+            string insert = "INSERT INTO Materias (Nombre, Semestre, Codigo, Horas) " +
+                "VALUES (@nombre, @semestre, @codigo, @horas)";
+
 
             using var cmd = new SQLiteCommand(insert, conexion);
             cmd.Parameters.AddWithValue("@nombre", nombre);
             cmd.Parameters.AddWithValue("@semestre", semestre);
             cmd.Parameters.AddWithValue("@codigo", codigo);
             cmd.Parameters.AddWithValue("@horas", horas);
-            cmd.Parameters.AddWithValue("@mesas", mesas);
-            cmd.Parameters.AddWithValue("@lab", lab);
             cmd.ExecuteNonQuery();
 
             MostrarMaterias();
@@ -208,14 +172,18 @@ namespace UniversidadApp
             panelAgregarMateria.Visible = false;
         }
 
+        private void txtFiltroMateria_TextChanged(object sender, EventArgs e)
+        {
+            MostrarMaterias();
+        }
+
+
         private void LimpiarCampos()
         {
             txtNombre.Clear();
             txtSemestre.Clear();
             txtCodigo.Clear();
             txtHoras.Clear();
-            checkMesas.Checked = false;
-            checkLaboratorio.Checked = false;
         }
 
         private void comboSemestre_SelectedIndexChanged(object sender, EventArgs e)
@@ -223,16 +191,11 @@ namespace UniversidadApp
             MostrarMaterias();
         }
 
-        private void checkMesas_CheckedChanged(object sender, EventArgs e)
-        {
-            if (checkMesas.Checked)
-                checkLaboratorio.Checked = false;
-        }
+        
 
-        private void checkLaboratorio_CheckedChanged(object sender, EventArgs e)
+        private void dataGridViewMaterias_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
-            if (checkLaboratorio.Checked)
-                checkMesas.Checked = false;
+
         }
     }
 }

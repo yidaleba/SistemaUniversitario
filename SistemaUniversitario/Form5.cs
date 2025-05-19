@@ -217,7 +217,7 @@ namespace UniversidadApp
         {
             Form3 form3 = new Form3();
             form3.Show();
-            this.Close();
+            this.Hide();
         }
 
         private class ComboBoxItem

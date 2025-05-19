@@ -11,12 +11,12 @@
         private System.Windows.Forms.TextBox txtSemestre;
         private System.Windows.Forms.TextBox txtCodigo;
         private System.Windows.Forms.TextBox txtHoras;
-        private System.Windows.Forms.CheckBox checkMesas;
-        private System.Windows.Forms.CheckBox checkLaboratorio;
         private System.Windows.Forms.Button btnGuardar;
         private System.Windows.Forms.Label lblSemestre;
         private System.Windows.Forms.Button btnVolver;
         private System.Windows.Forms.Button btnGuardarCambios;
+        private System.Windows.Forms.TextBox txtFiltroMateria;
+        private System.Windows.Forms.Label lblBuscar;
 
 
         protected override void Dispose(bool disposing)
@@ -38,22 +38,23 @@
             txtSemestre = new TextBox();
             txtCodigo = new TextBox();
             txtHoras = new TextBox();
-            checkMesas = new CheckBox();
-            checkLaboratorio = new CheckBox();
             btnGuardar = new Button();
             lblSemestre = new Label();
             btnVolver = new Button();
             btnGuardarCambios = new Button();
+            txtFiltroMateria = new TextBox();
+            lblBuscar = new Label();
             ((System.ComponentModel.ISupportInitialize)dataGridViewMaterias).BeginInit();
             panelAgregarMateria.SuspendLayout();
             SuspendLayout();
             // 
             // dataGridViewMaterias
             // 
-            dataGridViewMaterias.Location = new Point(12, 50);
+            dataGridViewMaterias.Location = new Point(12, 86);
             dataGridViewMaterias.Name = "dataGridViewMaterias";
-            dataGridViewMaterias.Size = new Size(760, 250);
+            dataGridViewMaterias.Size = new Size(827, 250);
             dataGridViewMaterias.TabIndex = 0;
+            dataGridViewMaterias.CellContentClick += dataGridViewMaterias_CellContentClick;
             // 
             // comboSemestre
             // 
@@ -78,12 +79,10 @@
             panelAgregarMateria.Controls.Add(txtSemestre);
             panelAgregarMateria.Controls.Add(txtCodigo);
             panelAgregarMateria.Controls.Add(txtHoras);
-            panelAgregarMateria.Controls.Add(checkMesas);
-            panelAgregarMateria.Controls.Add(checkLaboratorio);
             panelAgregarMateria.Controls.Add(btnGuardar);
-            panelAgregarMateria.Location = new Point(12, 310);
+            panelAgregarMateria.Location = new Point(12, 352);
             panelAgregarMateria.Name = "panelAgregarMateria";
-            panelAgregarMateria.Size = new Size(400, 150);
+            panelAgregarMateria.Size = new Size(443, 91);
             panelAgregarMateria.TabIndex = 1;
             // 
             // txtNombre
@@ -96,7 +95,7 @@
             // 
             // txtSemestre
             // 
-            txtSemestre.Location = new Point(10, 40);
+            txtSemestre.Location = new Point(116, 10);
             txtSemestre.Name = "txtSemestre";
             txtSemestre.PlaceholderText = "Semestre";
             txtSemestre.Size = new Size(100, 23);
@@ -104,7 +103,7 @@
             // 
             // txtCodigo
             // 
-            txtCodigo.Location = new Point(10, 70);
+            txtCodigo.Location = new Point(222, 10);
             txtCodigo.Name = "txtCodigo";
             txtCodigo.PlaceholderText = "Código";
             txtCodigo.Size = new Size(100, 23);
@@ -112,35 +111,17 @@
             // 
             // txtHoras
             // 
-            txtHoras.Location = new Point(10, 100);
+            txtHoras.Location = new Point(328, 10);
             txtHoras.Name = "txtHoras";
             txtHoras.PlaceholderText = "Horas";
             txtHoras.Size = new Size(100, 23);
             txtHoras.TabIndex = 3;
             // 
-            // checkMesas
-            // 
-            checkMesas.Location = new Point(150, 10);
-            checkMesas.Name = "checkMesas";
-            checkMesas.Size = new Size(104, 24);
-            checkMesas.TabIndex = 4;
-            checkMesas.Text = "Mesas";
-            checkMesas.CheckedChanged += checkMesas_CheckedChanged;
-            // 
-            // checkLaboratorio
-            // 
-            checkLaboratorio.Location = new Point(150, 40);
-            checkLaboratorio.Name = "checkLaboratorio";
-            checkLaboratorio.Size = new Size(104, 24);
-            checkLaboratorio.TabIndex = 5;
-            checkLaboratorio.Text = "Laboratorio";
-            checkLaboratorio.CheckedChanged += checkLaboratorio_CheckedChanged;
-            // 
             // btnGuardar
             // 
-            btnGuardar.Location = new Point(150, 80);
+            btnGuardar.Location = new Point(152, 39);
             btnGuardar.Name = "btnGuardar";
-            btnGuardar.Size = new Size(75, 23);
+            btnGuardar.Size = new Size(118, 36);
             btnGuardar.TabIndex = 6;
             btnGuardar.Text = "Guardar";
             btnGuardar.Click += btnGuardar_Click;
@@ -164,7 +145,7 @@
             // 
             // btnGuardarCambios
             // 
-            btnGuardarCambios.Location = new Point(591, 306);
+            btnGuardarCambios.Location = new Point(658, 352);
             btnGuardarCambios.Name = "btnGuardarCambios";
             btnGuardarCambios.Size = new Size(181, 30);
             btnGuardarCambios.TabIndex = 0;
@@ -172,9 +153,28 @@
             btnGuardarCambios.UseVisualStyleBackColor = true;
             btnGuardarCambios.Click += btnGuardarCambios_Click;
             // 
+            // txtFiltroMateria
+            // 
+            txtFiltroMateria.Location = new Point(116, 57);
+            txtFiltroMateria.Name = "txtFiltroMateria";
+            txtFiltroMateria.Size = new Size(200, 23);
+            txtFiltroMateria.TabIndex = 102;
+            txtFiltroMateria.TextChanged += txtFiltroMateria_TextChanged;
+            // 
+            // lblBuscar
+            // 
+            lblBuscar.AutoSize = true;
+            lblBuscar.Location = new Point(22, 60);
+            lblBuscar.Name = "lblBuscar";
+            lblBuscar.Size = new Size(88, 15);
+            lblBuscar.TabIndex = 101;
+            lblBuscar.Text = "Buscar Materia:";
+            // 
             // Form4
             // 
-            ClientSize = new Size(784, 481);
+            ClientSize = new Size(851, 477);
+            Controls.Add(lblBuscar);
+            Controls.Add(txtFiltroMateria);
             Controls.Add(btnGuardarCambios);
             Controls.Add(btnVolver);
             Controls.Add(dataGridViewMaterias);
@@ -187,6 +187,7 @@
             panelAgregarMateria.ResumeLayout(false);
             panelAgregarMateria.PerformLayout();
             ResumeLayout(false);
+            PerformLayout();
         }
     }
 }

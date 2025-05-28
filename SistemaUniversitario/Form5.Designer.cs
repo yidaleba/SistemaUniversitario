@@ -33,10 +33,6 @@
             labelHoraFin2 = new Label();
             ((System.ComponentModel.ISupportInitialize)dataGridViewHorario).BeginInit();
             SuspendLayout();
-
-            //
-        
-
             // 
             // comboSemestre
             // 
@@ -119,7 +115,7 @@
             // 
             // dataGridViewHorario
             // 
-            dataGridViewHorario.Location = new Point(20, 200);
+            dataGridViewHorario.Location = new Point(33, 189);
             dataGridViewHorario.Name = "dataGridViewHorario";
             dataGridViewHorario.Size = new Size(750, 300);
             dataGridViewHorario.TabIndex = 18;
@@ -127,9 +123,9 @@
             // 
             // btnVolver
             // 
-            btnVolver.Location = new Point(650, 20);
+            btnVolver.Location = new Point(1159, 8);
             btnVolver.Name = "btnVolver";
-            btnVolver.Size = new Size(120, 30);
+            btnVolver.Size = new Size(138, 38);
             btnVolver.TabIndex = 17;
             btnVolver.Text = "Volver";
             btnVolver.Click += btnVolver_Click;
@@ -200,7 +196,7 @@
             // 
             // Form5
             // 
-            ClientSize = new Size(800, 520);
+            ClientSize = new Size(902, 541);
             Controls.Add(labelSemestre);
             Controls.Add(labelMateria);
             Controls.Add(labelDia1);
@@ -220,8 +216,11 @@
             Controls.Add(btnGuardar);
             Controls.Add(btnVolver);
             Controls.Add(dataGridViewHorario);
+            FormBorderStyle = FormBorderStyle.FixedToolWindow;
             Name = "Form5";
+            StartPosition = FormStartPosition.CenterScreen;
             Text = "Gestión de Horarios";
+            WindowState = FormWindowState.Maximized;
             ((System.ComponentModel.ISupportInitialize)dataGridViewHorario).EndInit();
             ResumeLayout(false);
         }

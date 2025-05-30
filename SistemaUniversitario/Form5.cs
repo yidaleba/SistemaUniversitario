@@ -17,6 +17,7 @@ namespace UniversidadApp
             conexion.Open();
             this.FormClosed += (s, e) => Application.Exit();
             CrearTablaHorariosSiNoExiste();
+            CargarCarreras(); // nuevo
             CargarSemestres();
             MostrarHorario();
         }
@@ -42,7 +43,29 @@ namespace UniversidadApp
             comboSemestre.SelectedIndexChanged += ComboSemestre_SelectedIndexChanged;
         }
 
+        private void CargarCarreras()
+        {
+            comboCarrera.Items.Clear();
+            string query = "SELECT DISTINCT Carrera FROM Materias ORDER BY Carrera";
+            using var cmd = new SQLiteCommand(query, conexion);
+            using var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                comboCarrera.Items.Add(reader["Carrera"].ToString());
+            }
+
+            comboCarrera.SelectedIndexChanged += ComboCarrera_SelectedIndexChanged;
+        }
+
+
+
         private void ComboSemestre_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            CargarMaterias();
+            MostrarHorario();
+        }
+
+        private void ComboCarrera_SelectedIndexChanged(object sender, EventArgs e)
         {
             CargarMaterias();
             MostrarHorario();
@@ -52,10 +75,11 @@ namespace UniversidadApp
         {
             comboMateria.Items.Clear();
 
-            if (comboSemestre.SelectedItem == null) return;
+            if (comboCarrera.SelectedItem == null || comboSemestre.SelectedItem == null) return;
 
-            string query = "SELECT Id, Nombre FROM Materias WHERE Semestre = @semestre";
+            string query = "SELECT Id, Nombre FROM Materias WHERE Carrera = @carrera AND Semestre = @semestre";
             using var cmd = new SQLiteCommand(query, conexion);
+            cmd.Parameters.AddWithValue("@carrera", comboCarrera.SelectedItem.ToString());
             cmd.Parameters.AddWithValue("@semestre", comboSemestre.SelectedItem.ToString());
 
             using var reader = cmd.ExecuteReader();
@@ -64,6 +88,7 @@ namespace UniversidadApp
                 comboMateria.Items.Add(new ComboBoxItem(reader["Nombre"].ToString(), reader["Id"].ToString()));
             }
         }
+
 
         private void btnGuardar_Click(object sender, EventArgs e)
         {
@@ -160,7 +185,7 @@ namespace UniversidadApp
 
         private void MostrarHorario()
         {
-            if (comboSemestre.SelectedItem == null)
+            if (comboCarrera.SelectedItem == null || comboSemestre.SelectedItem == null)
                 return;
 
             DataTable dt = new DataTable();
@@ -180,10 +205,12 @@ namespace UniversidadApp
             }
 
             string query = @"SELECT h.Dia, h.HoraInicio, h.HoraFin, m.Nombre 
-                             FROM Horarios h
-                             INNER JOIN Materias m ON h.MateriaId = m.Id
-                             WHERE m.Semestre = @semestre";
+                     FROM Horarios h
+                     INNER JOIN Materias m ON h.MateriaId = m.Id
+                     WHERE m.Carrera = @carrera AND m.Semestre = @semestre";
+
             using var cmd = new SQLiteCommand(query, conexion);
+            cmd.Parameters.AddWithValue("@carrera", comboCarrera.SelectedItem.ToString());
             cmd.Parameters.AddWithValue("@semestre", comboSemestre.SelectedItem.ToString());
 
             using var reader = cmd.ExecuteReader();
@@ -213,12 +240,69 @@ namespace UniversidadApp
             dataGridViewHorario.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
         }
 
+
         private void btnVolver_Click(object sender, EventArgs e)
         {
             Form3 form3 = new Form3();
             form3.Show();
             this.Hide();
         }
+
+        private void comboCarrera_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            // Aquí puedes poner la lógica para filtrar materias según la carrera seleccionada
+            // Por ejemplo:
+            CargarMateriasFiltradas();
+        }
+
+        private void CargarMateriasFiltradas()
+        {
+            string carreraSeleccionada = comboCarrera.SelectedItem?.ToString();
+            string semestreSeleccionado = comboSemestre.SelectedItem?.ToString();
+
+            if (string.IsNullOrEmpty(carreraSeleccionada) || string.IsNullOrEmpty(semestreSeleccionado))
+                return;
+
+            // Aquí llamas a tu base de datos para filtrar las materias según carrera y semestre.
+            // Por ejemplo, suponiendo que tienes una conexión a SQLite:
+            string consulta = "SELECT Nombre FROM Materias WHERE Carrera = @carrera AND Semestre = @semestre";
+            using (SQLiteConnection conn = new SQLiteConnection("Data Source=universidad.db"))
+            {
+                conn.Open();
+                SQLiteCommand cmd = new SQLiteCommand(consulta, conn);
+                cmd.Parameters.AddWithValue("@carrera", carreraSeleccionada);
+                cmd.Parameters.AddWithValue("@semestre", semestreSeleccionado);
+
+                SQLiteDataReader reader = cmd.ExecuteReader();
+                comboMateria.Items.Clear();
+                while (reader.Read())
+                {
+                    comboMateria.Items.Add(reader["Nombre"].ToString());
+                }
+            }
+        }
+
+        private void textBuscarMateria_TextChanged(object sender, EventArgs e)
+        {
+            FiltrarMateriasPorTexto();
+        }
+
+        private void FiltrarMateriasPorTexto()
+        {
+            string textoFiltro = textBuscarMateria.Text.ToLower();
+
+            foreach (DataGridViewRow fila in dataGridViewHorario.Rows)
+            {
+                if (fila.Cells["NombreMateria"].Value != null)
+                {
+                    string nombreMateria = fila.Cells["NombreMateria"].Value.ToString().ToLower();
+                    fila.Visible = nombreMateria.Contains(textoFiltro);
+                }
+            }
+        }
+
+
+
 
         private class ComboBoxItem
         {
@@ -235,6 +319,11 @@ namespace UniversidadApp
         }
 
         private void dataGridViewHorario_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
+
+        private void labelDia1_Click(object sender, EventArgs e)
         {
 
         }

@@ -64,7 +64,7 @@
             // comboMateria
             // 
             comboMateria.FormattingEnabled = true;
-            comboMateria.Location = new Point(585, 30);
+            comboMateria.Location = new Point(610, 30);
             comboMateria.Name = "comboMateria";
             comboMateria.Size = new Size(200, 23);
             comboMateria.TabIndex = 3;
@@ -125,9 +125,9 @@
             // 
             // btnGuardar
             // 
-            btnGuardar.Location = new Point(838, 87);
+            btnGuardar.Location = new Point(994, 80);
             btnGuardar.Name = "btnGuardar";
-            btnGuardar.Size = new Size(160, 59);
+            btnGuardar.Size = new Size(100, 30);
             btnGuardar.TabIndex = 10;
             btnGuardar.Text = "Guardar";
             btnGuardar.UseVisualStyleBackColor = true;
@@ -135,9 +135,9 @@
             // 
             // btnVolver
             // 
-            btnVolver.Location = new Point(1125, 12);
+            btnVolver.Location = new Point(980, 23);
             btnVolver.Name = "btnVolver";
-            btnVolver.Size = new Size(151, 51);
+            btnVolver.Size = new Size(100, 30);
             btnVolver.TabIndex = 11;
             btnVolver.Text = "Volver";
             btnVolver.UseVisualStyleBackColor = true;
@@ -177,7 +177,7 @@
             // 
             // labelMateria
             // 
-            labelMateria.Location = new Point(585, 9);
+            labelMateria.Location = new Point(610, 9);
             labelMateria.Name = "labelMateria";
             labelMateria.Size = new Size(100, 23);
             labelMateria.TabIndex = 16;
@@ -217,7 +217,7 @@
             // 
             // Form5
             // 
-            ClientSize = new Size(1288, 589);
+            ClientSize = new Size(1328, 589);
             Controls.Add(comboCarrera);
             Controls.Add(comboSemestre);
             Controls.Add(textBuscarMateria);
@@ -239,10 +239,8 @@
             Controls.Add(labelHora1);
             Controls.Add(labelDia2);
             Controls.Add(labelHora2);
-            FormBorderStyle = FormBorderStyle.FixedToolWindow;
             Name = "Form5";
             Text = "Asignación de Horarios";
-            WindowState = FormWindowState.Maximized;
             ((System.ComponentModel.ISupportInitialize)dataGridViewHorario).EndInit();
             ResumeLayout(false);
             PerformLayout();

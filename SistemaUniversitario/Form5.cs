@@ -20,6 +20,8 @@ namespace UniversidadApp
             CargarCarreras(); // nuevo
             CargarSemestres();
             MostrarHorario();
+            dataGridViewHorario.CellClick += dataGridViewHorario_CellClick;
+
         }
 
         private void CrearTablaHorariosSiNoExiste()
@@ -188,57 +190,101 @@ namespace UniversidadApp
             if (comboCarrera.SelectedItem == null || comboSemestre.SelectedItem == null)
                 return;
 
-            DataTable dt = new DataTable();
-            dt.Columns.Add("Hora");
+            string carrera = comboCarrera.SelectedItem.ToString();
+            string semestre = comboSemestre.SelectedItem.ToString();
 
-            string[] dias = { "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sabado" };
-            foreach (var dia in dias)
-                dt.Columns.Add(dia);
-
-            for (int h = 7; h <= 20; h++)
-            {
-                DataRow fila = dt.NewRow();
-                fila["Hora"] = $"{h}:00";
-                foreach (var dia in dias)
-                    fila[dia] = "";
-                dt.Rows.Add(fila);
-            }
-
-            string query = @"SELECT h.Dia, h.HoraInicio, h.HoraFin, m.Nombre 
-                     FROM Horarios h
-                     INNER JOIN Materias m ON h.MateriaId = m.Id
-                     WHERE m.Carrera = @carrera AND m.Semestre = @semestre";
+            string query = @"
+        SELECT 
+            m.Id AS MateriaId,
+            m.Nombre AS NombreMateria,
+            m.Carrera,
+            m.Semestre,
+            h.Dia,
+            h.HoraInicio,
+            h.HoraFin
+        FROM Horarios h
+        INNER JOIN Materias m ON h.MateriaId = m.Id
+        WHERE m.Carrera = @carrera AND m.Semestre = @semestre
+        ORDER BY m.Nombre, h.Dia
+    ";
 
             using var cmd = new SQLiteCommand(query, conexion);
-            cmd.Parameters.AddWithValue("@carrera", comboCarrera.SelectedItem.ToString());
-            cmd.Parameters.AddWithValue("@semestre", comboSemestre.SelectedItem.ToString());
+            cmd.Parameters.AddWithValue("@carrera", carrera);
+            cmd.Parameters.AddWithValue("@semestre", semestre);
 
-            using var reader = cmd.ExecuteReader();
-            while (reader.Read())
+            using var adapter = new SQLiteDataAdapter(cmd);
+            DataTable dt = new DataTable();
+            adapter.Fill(dt);
+
+            dataGridViewHorario.DataSource = dt;
+
+            // Quitar columnas de botones si ya existen
+            if (dataGridViewHorario.Columns["Editar"] == null)
             {
-                string dia = reader["Dia"].ToString();
-                string inicio = reader["HoraInicio"].ToString();
-                string fin = reader["HoraFin"].ToString();
-                string nombre = reader["Nombre"].ToString();
-
-                int hi = TimeSpan.Parse(inicio).Hours;
-                int hf = TimeSpan.Parse(fin).Hours;
-
-                for (int h = hi; h < hf; h++)
+                var btnEditar = new DataGridViewButtonColumn
                 {
-                    foreach (DataRow row in dt.Rows)
+                    HeaderText = "Editar",
+                    Name = "Editar",
+                    Text = "Editar",
+                    UseColumnTextForButtonValue = true
+                };
+                dataGridViewHorario.Columns.Add(btnEditar);
+            }
+
+            if (dataGridViewHorario.Columns["Eliminar"] == null)
+            {
+                var btnEliminar = new DataGridViewButtonColumn
+                {
+                    HeaderText = "Eliminar",
+                    Name = "Eliminar",
+                    Text = "Eliminar",
+                    UseColumnTextForButtonValue = true
+                };
+                dataGridViewHorario.Columns.Add(btnEliminar);
+            }
+
+            dataGridViewHorario.Columns["MateriaId"].Visible = false;
+
+            dataGridViewHorario.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            dataGridViewHorario.AllowUserToAddRows = false;
+            dataGridViewHorario.ReadOnly = true;
+            dataGridViewHorario.Columns.Cast<DataGridViewColumn>().ToList().ForEach(col => col.SortMode = DataGridViewColumnSortMode.Automatic);
+        }
+
+
+        private void dataGridViewHorario_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex >= 0)
+            {
+                var grid = (DataGridView)sender;
+
+                if (grid.Columns[e.ColumnIndex].Name == "Editar")
+                {
+                    int materiaId = Convert.ToInt32(grid.Rows[e.RowIndex].Cells["MateriaId"].Value);
+                    // Abre un nuevo formulario o panel para editar horarios
+                    MessageBox.Show("Editar horario de la materia con ID: " + materiaId);
+                    // Aquí podrías cargar un formulario de edición con los datos actuales
+                }
+
+                if (grid.Columns[e.ColumnIndex].Name == "Eliminar")
+                {
+                    int materiaId = Convert.ToInt32(grid.Rows[e.RowIndex].Cells["MateriaId"].Value);
+                    DialogResult result = MessageBox.Show("¿Estás seguro de que deseas eliminar todos los horarios de esta materia?", "Confirmar eliminación", MessageBoxButtons.YesNo);
+                    if (result == DialogResult.Yes)
                     {
-                        if (row["Hora"].ToString().StartsWith($"{h}:"))
-                        {
-                            row[dia] = nombre;
-                        }
+                        string deleteQuery = "DELETE FROM Horarios WHERE MateriaId = @id";
+                        using var cmd = new SQLiteCommand(deleteQuery, conexion);
+                        cmd.Parameters.AddWithValue("@id", materiaId);
+                        cmd.ExecuteNonQuery();
+
+                        MostrarHorario();
                     }
                 }
             }
-
-            dataGridViewHorario.DataSource = dt;
-            dataGridViewHorario.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
         }
+
+
+
 
 
         private void btnVolver_Click(object sender, EventArgs e)

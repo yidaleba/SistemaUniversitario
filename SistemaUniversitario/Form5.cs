@@ -19,9 +19,18 @@ namespace UniversidadApp
             CrearTablaHorariosSiNoExiste();
             CargarCarreras(); // nuevo
             CargarSemestres();
-            MostrarHorario();
             cargarHorarios();
             dataGridViewHorario.CellClick += dataGridViewHorario_CellClick;
+            dataGridViewHorario.Columns["Id"].Visible = false;
+
+            // Esperar a que comboCarrera y comboSemestre estén cargados
+            if (comboCarrera.SelectedItem != null && comboSemestre.SelectedItem != null)
+            {
+                cargarHorarios();
+            }
+            comboCarrera.DropDownStyle = ComboBoxStyle.DropDownList;
+            comboSemestre.DropDownStyle = ComboBoxStyle.DropDownList;
+            comboMateria.DropDownStyle = ComboBoxStyle.DropDownList;
 
         }
 
@@ -43,10 +52,14 @@ namespace UniversidadApp
         private void CargarSemestres()
         {
             comboSemestre.Items.Clear();
+            comboSemestre.Items.Add("Todos");  // Opción para mostrar todos
             for (int i = 1; i <= 10; i++)
                 comboSemestre.Items.Add(i.ToString());
+
+            comboSemestre.SelectedItem = "Todos"; // Selección por defecto
             comboSemestre.SelectedIndexChanged += ComboSemestre_SelectedIndexChanged;
         }
+
 
         private void CargarCarreras()
         {
@@ -59,35 +72,61 @@ namespace UniversidadApp
                 comboCarrera.Items.Add(reader["Carrera"].ToString());
             }
 
+            // Establecer "Ingeniería Civil" si está en la lista
+            if (comboCarrera.Items.Contains("Ingenieria civil"))
+            {
+                comboCarrera.SelectedItem = "Ingenieria civil";
+            }
+
             comboCarrera.SelectedIndexChanged += ComboCarrera_SelectedIndexChanged;
         }
+
+
 
 
 
         private void ComboSemestre_SelectedIndexChanged(object sender, EventArgs e)
         {
             CargarMaterias();
-            MostrarHorario();
+            cargarHorarios();
         }
 
-    
+
 
         private void CargarMaterias()
         {
             comboMateria.Items.Clear();
-
             if (comboCarrera.SelectedItem == null || comboSemestre.SelectedItem == null) return;
 
-            string query = "SELECT Id, Nombre FROM Materias WHERE Carrera = @carrera AND Semestre = @semestre";
+            string filtro = comboMateria.Text.Trim();
+            string carrera = comboCarrera.SelectedItem.ToString();
+            string semestre = comboSemestre.SelectedItem.ToString();
+
+            string query = @"SELECT Id, Nombre FROM Materias 
+                     WHERE Carrera = @carrera";
+
+            if (semestre != "Todos")
+                query += " AND Semestre = @semestre";
+
+            query += " AND (Nombre LIKE @filtro OR Codigo LIKE @filtro)";
+
             using var cmd = new SQLiteCommand(query, conexion);
-            cmd.Parameters.AddWithValue("@carrera", comboCarrera.SelectedItem.ToString());
-            cmd.Parameters.AddWithValue("@semestre", comboSemestre.SelectedItem.ToString());
+            cmd.Parameters.AddWithValue("@carrera", carrera);
+            if (semestre != "Todos")
+                cmd.Parameters.AddWithValue("@semestre", semestre);
+            cmd.Parameters.AddWithValue("@filtro", $"%{filtro}%");
 
             using var reader = cmd.ExecuteReader();
             while (reader.Read())
             {
                 comboMateria.Items.Add(new ComboBoxItem(reader["Nombre"].ToString(), reader["Id"].ToString()));
             }
+        }
+
+
+        private void comboMateria_TextChanged(object sender, EventArgs e)
+        {
+            CargarMaterias();
         }
 
 
@@ -98,19 +137,48 @@ namespace UniversidadApp
             using (var conn = new SQLiteConnection("Data Source=universidad.db"))
             {
                 conn.Open();
-                string query = @"SELECT h.Id, m.Nombre AS Materia, m.Codigo, h.Grupo, h.CantEstudiantes, h.Dia, h.HoraInicio, h.HoraFin
+                string query = @"SELECT h.Id, m.Nombre AS Materia, m.Codigo, m.Carrera, m.Semestre, h.Grupo, h.CantEstudiantes, h.Dia, h.HoraInicio, h.HoraFin
                          FROM Horarios h
-                         INNER JOIN Materias m ON h.MateriaId = m.Id";
+                         INNER JOIN Materias m ON h.MateriaId = m.Id
+                         WHERE 1=1"; // base de la consulta
 
-                using (var da = new SQLiteDataAdapter(query, conn))
+                var cmd = new SQLiteCommand();
+                cmd.Connection = conn;
+
+                // Filtro por carrera
+                if (comboCarrera.SelectedItem != null)
+                {
+                    query += " AND m.Carrera = @carrera";
+                    cmd.Parameters.AddWithValue("@carrera", comboCarrera.SelectedItem.ToString());
+                }
+
+                // Filtro por semestre
+                if (comboSemestre.SelectedItem != null && comboSemestre.SelectedItem.ToString() != "Todos")
+                {
+                    query += " AND m.Semestre = @semestre";
+                    cmd.Parameters.AddWithValue("@semestre", comboSemestre.SelectedItem.ToString());
+                }
+
+                // Filtro por materia (nombre o código)
+                string filtroMateria = comboMateria.Text.Trim();
+                if (!string.IsNullOrEmpty(filtroMateria))
+                {
+                    query += " AND (m.Nombre LIKE @filtro OR m.Codigo LIKE @filtro)";
+                    cmd.Parameters.AddWithValue("@filtro", $"%{filtroMateria}%");
+                }
+
+                cmd.CommandText = query;
+
+                using (var da = new SQLiteDataAdapter(cmd))
                 {
                     DataTable dt = new DataTable();
                     da.Fill(dt);
                     dataGridViewHorario.DataSource = dt;
 
-                    // Opcional: cambiar encabezados
                     dataGridViewHorario.Columns["Materia"].HeaderText = "Materia";
                     dataGridViewHorario.Columns["Codigo"].HeaderText = "Código";
+                    dataGridViewHorario.Columns["Carrera"].HeaderText = "Carrera";
+                    dataGridViewHorario.Columns["Semestre"].HeaderText = "Semestre";
                     dataGridViewHorario.Columns["Grupo"].HeaderText = "Grupo";
                     dataGridViewHorario.Columns["CantEstudiantes"].HeaderText = "N° Estudiantes";
                     dataGridViewHorario.Columns["Dia"].HeaderText = "Día";
@@ -124,17 +192,6 @@ namespace UniversidadApp
         }
 
 
-        private bool HayConflictoHorario(string dia, string inicio, string fin)
-        {
-            string query = @"SELECT COUNT(*) FROM Horarios WHERE Dia = @dia 
-                             AND ((@inicio < HoraFin AND @fin > HoraInicio))";
-            using var cmd = new SQLiteCommand(query, conexion);
-            cmd.Parameters.AddWithValue("@dia", dia);
-            cmd.Parameters.AddWithValue("@inicio", inicio);
-            cmd.Parameters.AddWithValue("@fin", fin);
-
-            return Convert.ToInt32(cmd.ExecuteScalar()) > 0;
-        }
 
         private int ObtenerHorasMateria(int materiaId)
         {
@@ -162,72 +219,7 @@ namespace UniversidadApp
             cmd.ExecuteNonQuery();
         }
 
-        private void MostrarHorario()
-        {
-            if (comboCarrera.SelectedItem == null || comboSemestre.SelectedItem == null)
-                return;
-
-            string carrera = comboCarrera.SelectedItem.ToString();
-            string semestre = comboSemestre.SelectedItem.ToString();
-
-            string query = @"
-        SELECT 
-            m.Id AS MateriaId,
-            m.Nombre AS NombreMateria,
-            m.Carrera,
-            m.Semestre,
-            h.Dia,
-            h.HoraInicio,
-            h.HoraFin
-        FROM Horarios h
-        INNER JOIN Materias m ON h.MateriaId = m.Id
-        WHERE m.Carrera = @carrera AND m.Semestre = @semestre
-        ORDER BY m.Nombre, h.Dia
-    ";
-
-            using var cmd = new SQLiteCommand(query, conexion);
-            cmd.Parameters.AddWithValue("@carrera", carrera);
-            cmd.Parameters.AddWithValue("@semestre", semestre);
-
-            using var adapter = new SQLiteDataAdapter(cmd);
-            DataTable dt = new DataTable();
-            adapter.Fill(dt);
-
-            dataGridViewHorario.DataSource = dt;
-
-            // Quitar columnas de botones si ya existen
-            if (dataGridViewHorario.Columns["Editar"] == null)
-            {
-                var btnEditar = new DataGridViewButtonColumn
-                {
-                    HeaderText = "Editar",
-                    Name = "Editar",
-                    Text = "Editar",
-                    UseColumnTextForButtonValue = true
-                };
-                dataGridViewHorario.Columns.Add(btnEditar);
-            }
-
-            if (dataGridViewHorario.Columns["Eliminar"] == null)
-            {
-                var btnEliminar = new DataGridViewButtonColumn
-                {
-                    HeaderText = "Eliminar",
-                    Name = "Eliminar",
-                    Text = "Eliminar",
-                    UseColumnTextForButtonValue = true
-                };
-                dataGridViewHorario.Columns.Add(btnEliminar);
-            }
-
-            dataGridViewHorario.Columns["MateriaId"].Visible = false;
-
-            dataGridViewHorario.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-            dataGridViewHorario.AllowUserToAddRows = false;
-            dataGridViewHorario.ReadOnly = true;
-            dataGridViewHorario.Columns.Cast<DataGridViewColumn>().ToList().ForEach(col => col.SortMode = DataGridViewColumnSortMode.Automatic);
-        }
-
+       
 
         private void dataGridViewHorario_CellClick(object sender, DataGridViewCellEventArgs e)
         {
@@ -235,28 +227,30 @@ namespace UniversidadApp
             {
                 var grid = (DataGridView)sender;
 
-                if (grid.Columns[e.ColumnIndex].Name == "Editar")
+                if (!dataGridViewHorario.Columns.Contains("Editar"))
                 {
-                    int materiaId = Convert.ToInt32(grid.Rows[e.RowIndex].Cells["MateriaId"].Value);
-                    // Abre un nuevo formulario o panel para editar horarios
-                    MessageBox.Show("Editar horario de la materia con ID: " + materiaId);
-                    // Aquí podrías cargar un formulario de edición con los datos actuales
-                }
-
-                if (grid.Columns[e.ColumnIndex].Name == "Eliminar")
-                {
-                    int materiaId = Convert.ToInt32(grid.Rows[e.RowIndex].Cells["MateriaId"].Value);
-                    DialogResult result = MessageBox.Show("¿Estás seguro de que deseas eliminar todos los horarios de esta materia?", "Confirmar eliminación", MessageBoxButtons.YesNo);
-                    if (result == DialogResult.Yes)
+                    DataGridViewButtonColumn btnEditar = new DataGridViewButtonColumn
                     {
-                        string deleteQuery = "DELETE FROM Horarios WHERE MateriaId = @id";
-                        using var cmd = new SQLiteCommand(deleteQuery, conexion);
-                        cmd.Parameters.AddWithValue("@id", materiaId);
-                        cmd.ExecuteNonQuery();
-
-                        MostrarHorario();
-                    }
+                        HeaderText = "Editar",
+                        Name = "Editar",
+                        Text = "Editar",
+                        UseColumnTextForButtonValue = true
+                    };
+                    dataGridViewHorario.Columns.Add(btnEditar);
                 }
+
+                if (!dataGridViewHorario.Columns.Contains("Eliminar"))
+                {
+                    DataGridViewButtonColumn btnEliminar = new DataGridViewButtonColumn
+                    {
+                        HeaderText = "Eliminar",
+                        Name = "Eliminar",
+                        Text = "Eliminar",
+                        UseColumnTextForButtonValue = true
+                    };
+                    dataGridViewHorario.Columns.Add(btnEliminar);
+                }
+
             }
         }
 
@@ -275,40 +269,10 @@ namespace UniversidadApp
         {
             // Aquí puedes poner la lógica para filtrar materias según la carrera seleccionada
             // Por ejemplo:
-            CargarMateriasFiltradas();
+          
             CargarMaterias();
-            MostrarHorario();
+            cargarHorarios();
         }
-
-        private void CargarMateriasFiltradas()
-        {
-            string carreraSeleccionada = comboCarrera.SelectedItem?.ToString();
-            string semestreSeleccionado = comboSemestre.SelectedItem?.ToString();
-
-            if (string.IsNullOrEmpty(carreraSeleccionada) || string.IsNullOrEmpty(semestreSeleccionado))
-                return;
-
-            // Aquí llamas a tu base de datos para filtrar las materias según carrera y semestre.
-            // Por ejemplo, suponiendo que tienes una conexión a SQLite:
-            string consulta = "SELECT Nombre FROM Materias WHERE Carrera = @carrera AND Semestre = @semestre";
-            using (SQLiteConnection conn = new SQLiteConnection("Data Source=universidad.db"))
-            {
-                conn.Open();
-                SQLiteCommand cmd = new SQLiteCommand(consulta, conn);
-                cmd.Parameters.AddWithValue("@carrera", carreraSeleccionada);
-                cmd.Parameters.AddWithValue("@semestre", semestreSeleccionado);
-
-                SQLiteDataReader reader = cmd.ExecuteReader();
-                comboMateria.Items.Clear();
-                while (reader.Read())
-                {
-                    comboMateria.Items.Add(reader["Nombre"].ToString());
-                }
-            }
-        }
-
-
-
 
 
         private class ComboBoxItem
@@ -325,12 +289,6 @@ namespace UniversidadApp
             public override string ToString() => Text;
         }
 
-        private void btnAgregarHorario_Click(object sender, EventArgs e)
-        {
-            panelHorario.Visible = true; // Asegúrate de que el panel se llama así
-            panelHorario.BringToFront();
-            limpiarFormularioHorario();
-        }
 
         private void limpiarFormularioHorario()
         {
@@ -389,13 +347,17 @@ namespace UniversidadApp
 
         private void comboMateriaPanel_SelectedIndexChanged(object sender, EventArgs e)
         {
-
+            CargarMaterias();
+            cargarHorarios();
         }
 
         private void comboMateria_SelectedIndexChanged(object sender, EventArgs e)
         {
-
+            CargarMaterias();
+            cargarHorarios();
+             
         }
+
 
         private void btnGuardar_Click_1(object sender, EventArgs e)
         {

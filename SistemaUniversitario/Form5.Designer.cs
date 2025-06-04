@@ -26,6 +26,9 @@
             comboDocente = new ComboBox();
             comboDias = new ComboBox();
             comboMateriaPanel = new ComboBox();
+            label1 = new Label();
+            label2 = new Label();
+            label3 = new Label();
             ((System.ComponentModel.ISupportInitialize)dataGridViewHorario).BeginInit();
             panelHorario.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridViewAgregarHorario).BeginInit();
@@ -34,31 +37,28 @@
             // comboCarrera
             // 
             comboCarrera.FormattingEnabled = true;
-            comboCarrera.Location = new Point(20, 86);
+            comboCarrera.Location = new Point(76, 86);
             comboCarrera.Name = "comboCarrera";
             comboCarrera.Size = new Size(112, 23);
             comboCarrera.TabIndex = 0;
-            comboCarrera.Text = "Carrera";
             comboCarrera.SelectedIndexChanged += ComboCarrera_SelectedIndexChanged;
             // 
             // comboSemestre
             // 
             comboSemestre.FormattingEnabled = true;
-            comboSemestre.Location = new Point(20, 115);
+            comboSemestre.Location = new Point(76, 115);
             comboSemestre.Name = "comboSemestre";
             comboSemestre.Size = new Size(112, 23);
             comboSemestre.TabIndex = 1;
-            comboSemestre.Text = "Semestre";
             // 
             // comboMateria
             // 
             comboMateria.FormattingEnabled = true;
-            comboMateria.Location = new Point(20, 144);
+            comboMateria.Location = new Point(76, 144);
             comboMateria.Name = "comboMateria";
             comboMateria.Size = new Size(112, 23);
             comboMateria.TabIndex = 3;
             comboMateria.Tag = "";
-            comboMateria.Text = "Materia";
             comboMateria.SelectedIndexChanged += comboMateria_SelectedIndexChanged;
             // 
             // btnAgregarHorario
@@ -84,7 +84,7 @@
             // dataGridViewHorario
             // 
             dataGridViewHorario.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewHorario.Location = new Point(138, 12);
+            dataGridViewHorario.Location = new Point(194, 12);
             dataGridViewHorario.Name = "dataGridViewHorario";
             dataGridViewHorario.Size = new Size(737, 338);
             dataGridViewHorario.TabIndex = 12;
@@ -171,9 +171,39 @@
             comboMateriaPanel.Text = "Materia/Código";
             comboMateriaPanel.SelectedIndexChanged += comboMateriaPanel_SelectedIndexChanged;
             // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Location = new Point(15, 89);
+            label1.Name = "label1";
+            label1.Size = new Size(45, 15);
+            label1.TabIndex = 20;
+            label1.Text = "Carrera";
+            // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Location = new Point(15, 118);
+            label2.Name = "label2";
+            label2.Size = new Size(55, 15);
+            label2.TabIndex = 21;
+            label2.Text = "Semestre";
+            // 
+            // label3
+            // 
+            label3.AutoSize = true;
+            label3.Location = new Point(15, 147);
+            label3.Name = "label3";
+            label3.Size = new Size(47, 15);
+            label3.TabIndex = 22;
+            label3.Text = "Materia";
+            // 
             // Form5
             // 
             ClientSize = new Size(1328, 598);
+            Controls.Add(label3);
+            Controls.Add(label2);
+            Controls.Add(label1);
             Controls.Add(panelHorario);
             Controls.Add(comboCarrera);
             Controls.Add(comboSemestre);
@@ -183,11 +213,13 @@
             Controls.Add(dataGridViewHorario);
             Name = "Form5";
             Text = "Asignación de Horarios";
+            WindowState = FormWindowState.Maximized;
             ((System.ComponentModel.ISupportInitialize)dataGridViewHorario).EndInit();
             panelHorario.ResumeLayout(false);
             panelHorario.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridViewAgregarHorario).EndInit();
             ResumeLayout(false);
+            PerformLayout();
         }
 
         private System.Windows.Forms.ComboBox comboCarrera;
@@ -205,5 +237,8 @@
         private Button btnGuardar;
         private ComboBox comboGrupo;
         private TextBox textBoxEstudiantes;
+        private Label label1;
+        private Label label2;
+        private Label label3;
     }
 }

@@ -20,6 +20,7 @@ namespace UniversidadApp
             CargarCarreras(); // nuevo
             CargarSemestres();
             MostrarHorario();
+            cargarHorarios();
             dataGridViewHorario.CellClick += dataGridViewHorario_CellClick;
 
         }
@@ -29,6 +30,8 @@ namespace UniversidadApp
             string query = @"CREATE TABLE IF NOT EXISTS Horarios (
                 Id INTEGER PRIMARY KEY AUTOINCREMENT,
                 MateriaId INTEGER,
+                Grupo INTEGER NOT NULL,
+                CantEstudiantes INTEGER NOT NULL,
                 Dia TEXT,
                 HoraInicio TEXT,
                 HoraFin TEXT,
@@ -67,11 +70,7 @@ namespace UniversidadApp
             MostrarHorario();
         }
 
-        private void ComboCarrera_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            CargarMaterias();
-            MostrarHorario();
-        }
+    
 
         private void CargarMaterias()
         {
@@ -92,60 +91,38 @@ namespace UniversidadApp
         }
 
 
-        private void btnGuardar_Click(object sender, EventArgs e)
+
+
+        private void cargarHorarios()
         {
-            if (comboMateria.SelectedItem == null)
+            using (var conn = new SQLiteConnection("Data Source=universidad.db"))
             {
-                MessageBox.Show("Seleccione una materia.");
-                return;
+                conn.Open();
+                string query = @"SELECT h.Id, m.Nombre AS Materia, m.Codigo, h.Grupo, h.CantEstudiantes, h.Dia, h.HoraInicio, h.HoraFin
+                         FROM Horarios h
+                         INNER JOIN Materias m ON h.MateriaId = m.Id";
+
+                using (var da = new SQLiteDataAdapter(query, conn))
+                {
+                    DataTable dt = new DataTable();
+                    da.Fill(dt);
+                    dataGridViewHorario.DataSource = dt;
+
+                    // Opcional: cambiar encabezados
+                    dataGridViewHorario.Columns["Materia"].HeaderText = "Materia";
+                    dataGridViewHorario.Columns["Codigo"].HeaderText = "Código";
+                    dataGridViewHorario.Columns["Grupo"].HeaderText = "Grupo";
+                    dataGridViewHorario.Columns["CantEstudiantes"].HeaderText = "N° Estudiantes";
+                    dataGridViewHorario.Columns["Dia"].HeaderText = "Día";
+                    dataGridViewHorario.Columns["HoraInicio"].HeaderText = "Inicio";
+                    dataGridViewHorario.Columns["HoraFin"].HeaderText = "Fin";
+
+                    dataGridViewHorario.ReadOnly = true;
+                    dataGridViewHorario.AllowUserToAddRows = false;
+                }
             }
-
-            int materiaId = int.Parse(((ComboBoxItem)comboMateria.SelectedItem).Value);
-            string dia1 = comboDia1.Text;
-            string horaInicio1 = timeInicio1.Text;
-            string horaFin1 = timeFin1.Text;
-
-            string dia2 = comboDia2.Text;
-            string horaInicio2 = timeInicio2.Text;
-            string horaFin2 = timeFin2.Text;
-
-            if (string.IsNullOrWhiteSpace(dia1) || string.IsNullOrWhiteSpace(horaInicio1) || string.IsNullOrWhiteSpace(horaFin1))
-            {
-                MessageBox.Show("Debe completar al menos el primer horario.");
-                return;
-            }
-
-            if (dia1 == dia2)
-            {
-                MessageBox.Show("Los días seleccionados no pueden ser iguales.");
-                return;
-            }
-
-            double totalHoras = CalcularHoras(horaInicio1, horaFin1);
-            if (!string.IsNullOrWhiteSpace(dia2))
-                totalHoras += CalcularHoras(horaInicio2, horaFin2);
-
-            int horasPermitidas = ObtenerHorasMateria(materiaId);
-            if (totalHoras > horasPermitidas)
-            {
-                MessageBox.Show($"La suma de horas ({totalHoras}) supera las permitidas ({horasPermitidas}) para esta materia.");
-                return;
-            }
-
-            if (HayConflictoHorario(dia1, horaInicio1, horaFin1) ||
-                (!string.IsNullOrWhiteSpace(dia2) && HayConflictoHorario(dia2, horaInicio2, horaFin2)))
-            {
-                MessageBox.Show("Existe un conflicto de horario con otra materia.");
-                return;
-            }
-
-            GuardarHorario(materiaId, dia1, horaInicio1, horaFin1);
-            if (!string.IsNullOrWhiteSpace(dia2))
-                GuardarHorario(materiaId, dia2, horaInicio2, horaFin2);
-
-            MessageBox.Show("Horario guardado correctamente.");
-            MostrarHorario();
         }
+
 
         private bool HayConflictoHorario(string dia, string inicio, string fin)
         {
@@ -294,11 +271,13 @@ namespace UniversidadApp
             this.Hide();
         }
 
-        private void comboCarrera_SelectedIndexChanged(object sender, EventArgs e)
+        private void ComboCarrera_SelectedIndexChanged(object sender, EventArgs e)
         {
             // Aquí puedes poner la lógica para filtrar materias según la carrera seleccionada
             // Por ejemplo:
             CargarMateriasFiltradas();
+            CargarMaterias();
+            MostrarHorario();
         }
 
         private void CargarMateriasFiltradas()
@@ -328,24 +307,6 @@ namespace UniversidadApp
             }
         }
 
-        private void textBuscarMateria_TextChanged(object sender, EventArgs e)
-        {
-            FiltrarMateriasPorTexto();
-        }
-
-        private void FiltrarMateriasPorTexto()
-        {
-            string textoFiltro = textBuscarMateria.Text.ToLower();
-
-            foreach (DataGridViewRow fila in dataGridViewHorario.Rows)
-            {
-                if (fila.Cells["NombreMateria"].Value != null)
-                {
-                    string nombreMateria = fila.Cells["NombreMateria"].Value.ToString().ToLower();
-                    fila.Visible = nombreMateria.Contains(textoFiltro);
-                }
-            }
-        }
 
 
 
@@ -364,6 +325,53 @@ namespace UniversidadApp
             public override string ToString() => Text;
         }
 
+        private void btnAgregarHorario_Click(object sender, EventArgs e)
+        {
+            panelHorario.Visible = true; // Asegúrate de que el panel se llama así
+            panelHorario.BringToFront();
+            limpiarFormularioHorario();
+        }
+
+        private void limpiarFormularioHorario()
+        {
+            comboMateria.SelectedIndex = -1;
+            comboDias.SelectedIndex = -1;
+            comboGrupo.Text = "";
+            textBoxEstudiantes.Text = "";
+            comboDocente.SelectedIndex = -1;
+            comboDias.Text = "";
+            dataGridViewAgregarHorario.Rows.Clear();
+        }
+
+        private void comboDias_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            int cantidad = int.Parse(comboDias.SelectedItem.ToString());
+            dataGridViewAgregarHorario.Rows.Clear();
+
+            for (int i = 0; i < cantidad; i++)
+            {
+                dataGridViewAgregarHorario.Rows.Add(); // Asegúrate que las columnas sean: Día, HoraInicio, HoraFin
+            }
+        }
+
+        private int obtenerIdMateria(string texto)
+        {
+            int id = -1;
+            using (var conn = new SQLiteConnection("Data Source=universidad.db"))
+            {
+                conn.Open();
+                string query = "SELECT Id FROM Materias WHERE Nombre = @Texto OR Codigo = @Texto";
+                using (var cmd = new SQLiteCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@Texto", texto);
+                    var result = cmd.ExecuteScalar();
+                    if (result != null) id = Convert.ToInt32(result);
+                }
+            }
+            return id;
+        }
+
+
         private void dataGridViewHorario_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
 
@@ -372,6 +380,79 @@ namespace UniversidadApp
         private void labelDia1_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void comboBoxDias_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void comboMateriaPanel_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void comboMateria_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnGuardar_Click_1(object sender, EventArgs e)
+        {
+            if (comboMateria.SelectedIndex == -1 || comboDocente.SelectedIndex == -1 ||
+                string.IsNullOrWhiteSpace(comboGrupo.Text) || string.IsNullOrWhiteSpace(textBoxEstudiantes.Text))
+            {
+                MessageBox.Show("Por favor complete todos los campos.");
+                return;
+            }
+
+            int materiaId = obtenerIdMateria(comboMateria.Text);
+            int grupo = int.Parse(comboGrupo.Text);
+            int cantEstudiantes = int.Parse(textBoxEstudiantes.Text);
+
+            using (var conn = new SQLiteConnection("Data Source=universidad.db"))
+            {
+                conn.Open();
+
+                foreach (DataGridViewRow fila in dataGridViewAgregarHorario.Rows)
+                {
+                    if (fila.IsNewRow) continue;
+
+                    string dia = fila.Cells["Dia"].Value?.ToString();
+                    string horaInicio = fila.Cells["HoraInicio"].Value?.ToString();
+                    string horaFin = fila.Cells["HoraFin"].Value?.ToString();
+
+                    if (string.IsNullOrEmpty(dia) || string.IsNullOrEmpty(horaInicio) || string.IsNullOrEmpty(horaFin))
+                        continue;
+
+                    string query = @"INSERT INTO Horarios (MateriaId, Grupo, CantEstudiantes, Dia, HoraInicio, HoraFin)
+                             VALUES (@MateriaId, @Grupo, @CantEstudiantes, @Dia, @HoraInicio, @HoraFin)";
+
+                    using (var cmd = new SQLiteCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@MateriaId", materiaId);
+                        cmd.Parameters.AddWithValue("@Grupo", grupo);
+                        cmd.Parameters.AddWithValue("@CantEstudiantes", cantEstudiantes);
+                        cmd.Parameters.AddWithValue("@Dia", dia);
+                        cmd.Parameters.AddWithValue("@HoraInicio", horaInicio);
+                        cmd.Parameters.AddWithValue("@HoraFin", horaFin);
+
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+
+                MessageBox.Show("Horario guardado exitosamente.");
+                panelHorario.Visible = false;
+                limpiarFormularioHorario();
+                cargarHorarios(); // Refresca la tabla principal
+            }
+        }
+
+        private void btnAgregarHorario_Click_1(object sender, EventArgs e)
+        {
+            
+                panelHorario.Visible = !panelHorario.Visible;
+          
         }
     }
 }

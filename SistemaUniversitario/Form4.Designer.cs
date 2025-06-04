@@ -56,7 +56,7 @@
             // 
             comboSemestre.DropDownStyle = ComboBoxStyle.DropDownList;
             comboSemestre.FormattingEnabled = true;
-            comboSemestre.Location = new Point(453, 20);
+            comboSemestre.Location = new Point(429, 17);
             comboSemestre.Name = "comboSemestre";
             comboSemestre.Size = new Size(126, 23);
             comboSemestre.TabIndex = 2;
@@ -179,7 +179,7 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(337, 20);
+            label2.Location = new Point(317, 20);
             label2.Name = "label2";
             label2.Size = new Size(106, 15);
             label2.TabIndex = 9;
@@ -209,6 +209,7 @@
             Controls.Add(comboSemestre);
             Controls.Add(txtFiltroMateria);
             Controls.Add(dataGridViewMaterias);
+            FormBorderStyle = FormBorderStyle.FixedSingle;
             Name = "Form4";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Gestión de Materias";

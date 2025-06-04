@@ -20,6 +20,7 @@ namespace UniversidadApp
             CargarCarreras(); // nuevo
             CargarSemestres();
             cargarHorarios();
+            CargarMaterias();
             dataGridViewHorario.CellClick += dataGridViewHorario_CellClick;
             dataGridViewHorario.Columns["Id"].Visible = false;
 
@@ -30,7 +31,6 @@ namespace UniversidadApp
             }
             comboCarrera.DropDownStyle = ComboBoxStyle.DropDownList;
             comboSemestre.DropDownStyle = ComboBoxStyle.DropDownList;
-            comboMateria.DropDownStyle = ComboBoxStyle.DropDownList;
 
         }
 
@@ -117,16 +117,54 @@ namespace UniversidadApp
             cmd.Parameters.AddWithValue("@filtro", $"%{filtro}%");
 
             using var reader = cmd.ExecuteReader();
+            comboMateria.Items.Add("Todas");
             while (reader.Read())
             {
                 comboMateria.Items.Add(new ComboBoxItem(reader["Nombre"].ToString(), reader["Id"].ToString()));
             }
+            comboMateria.SelectedIndex = 0;
         }
 
 
         private void comboMateria_TextChanged(object sender, EventArgs e)
         {
-            CargarMaterias();
+            if (comboMateria.SelectedIndex == -1) // Solo si no es una selección directa
+            {
+                FiltrarMateriasPorTexto(comboMateria.Text.Trim());
+            }
+
+        }
+
+        private void FiltrarMateriasPorTexto(string texto)
+        {
+            comboMateria.Items.Clear();
+            if (comboCarrera.SelectedItem == null || comboSemestre.SelectedItem == null) return;
+
+            string carrera = comboCarrera.SelectedItem.ToString();
+            string semestre = comboSemestre.SelectedItem.ToString();
+
+            string query = @"SELECT Id, Nombre FROM Materias 
+                     WHERE Carrera = @carrera";
+
+            if (semestre != "Todos")
+                query += " AND Semestre = @semestre";
+
+            query += " AND (Nombre LIKE @filtro OR Codigo LIKE @filtro)";
+
+            using var cmd = new SQLiteCommand(query, conexion);
+            cmd.Parameters.AddWithValue("@carrera", carrera);
+            if (semestre != "Todos")
+                cmd.Parameters.AddWithValue("@semestre", semestre);
+            cmd.Parameters.AddWithValue("@filtro", $"%{texto}%");
+
+            using var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                comboMateria.Items.Add(new ComboBoxItem(reader["Nombre"].ToString(), reader["Id"].ToString()));
+            }
+
+            comboMateria.DroppedDown = true; // Opcional: muestra el menú desplegable al escribir
+            comboMateria.SelectionStart = comboMateria.Text.Length;
         }
 
 
@@ -159,9 +197,16 @@ namespace UniversidadApp
                     cmd.Parameters.AddWithValue("@semestre", comboSemestre.SelectedItem.ToString());
                 }
 
+                if (comboMateria.SelectedItem is ComboBoxItem selectedMateria)
+                {
+                    query += " AND m.Id = @materiaId";
+                    cmd.Parameters.AddWithValue("@materiaId", selectedMateria.Value);
+                }
+
                 // Filtro por materia (nombre o código)
                 string filtroMateria = comboMateria.Text.Trim();
-                if (!string.IsNullOrEmpty(filtroMateria))
+
+                if (!string.IsNullOrEmpty(filtroMateria) && filtroMateria != "Todas")
                 {
                     query += " AND (m.Nombre LIKE @filtro OR m.Codigo LIKE @filtro)";
                     cmd.Parameters.AddWithValue("@filtro", $"%{filtroMateria}%");
@@ -353,7 +398,7 @@ namespace UniversidadApp
 
         private void comboMateria_SelectedIndexChanged(object sender, EventArgs e)
         {
-            CargarMaterias();
+            
             cargarHorarios();
              
         }

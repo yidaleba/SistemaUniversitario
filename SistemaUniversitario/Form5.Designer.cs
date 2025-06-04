@@ -86,7 +86,7 @@
             dataGridViewHorario.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dataGridViewHorario.Location = new Point(194, 12);
             dataGridViewHorario.Name = "dataGridViewHorario";
-            dataGridViewHorario.Size = new Size(737, 338);
+            dataGridViewHorario.Size = new Size(934, 338);
             dataGridViewHorario.TabIndex = 12;
             // 
             // panelHorario

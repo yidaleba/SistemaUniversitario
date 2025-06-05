@@ -29,6 +29,7 @@
             label1 = new Label();
             label2 = new Label();
             label3 = new Label();
+            btnEditar = new Button();
             ((System.ComponentModel.ISupportInitialize)dataGridViewHorario).BeginInit();
             panelHorario.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridViewAgregarHorario).BeginInit();
@@ -37,7 +38,7 @@
             // comboCarrera
             // 
             comboCarrera.FormattingEnabled = true;
-            comboCarrera.Location = new Point(76, 86);
+            comboCarrera.Location = new Point(76, 17);
             comboCarrera.Name = "comboCarrera";
             comboCarrera.Size = new Size(112, 23);
             comboCarrera.TabIndex = 0;
@@ -46,7 +47,7 @@
             // comboSemestre
             // 
             comboSemestre.FormattingEnabled = true;
-            comboSemestre.Location = new Point(76, 115);
+            comboSemestre.Location = new Point(76, 61);
             comboSemestre.Name = "comboSemestre";
             comboSemestre.Size = new Size(112, 23);
             comboSemestre.TabIndex = 1;
@@ -54,7 +55,7 @@
             // comboMateria
             // 
             comboMateria.FormattingEnabled = true;
-            comboMateria.Location = new Point(76, 144);
+            comboMateria.Location = new Point(76, 101);
             comboMateria.Name = "comboMateria";
             comboMateria.Size = new Size(112, 23);
             comboMateria.TabIndex = 3;
@@ -73,7 +74,7 @@
             // 
             // btnVolver
             // 
-            btnVolver.Location = new Point(1223, 12);
+            btnVolver.Location = new Point(1231, 499);
             btnVolver.Name = "btnVolver";
             btnVolver.Size = new Size(93, 41);
             btnVolver.TabIndex = 11;
@@ -86,7 +87,7 @@
             dataGridViewHorario.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dataGridViewHorario.Location = new Point(194, 12);
             dataGridViewHorario.Name = "dataGridViewHorario";
-            dataGridViewHorario.Size = new Size(934, 338);
+            dataGridViewHorario.Size = new Size(1130, 338);
             dataGridViewHorario.TabIndex = 12;
             // 
             // panelHorario
@@ -174,7 +175,7 @@
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(15, 89);
+            label1.Location = new Point(12, 25);
             label1.Name = "label1";
             label1.Size = new Size(45, 15);
             label1.TabIndex = 20;
@@ -183,7 +184,7 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(15, 118);
+            label2.Location = new Point(12, 64);
             label2.Name = "label2";
             label2.Size = new Size(55, 15);
             label2.TabIndex = 21;
@@ -192,15 +193,26 @@
             // label3
             // 
             label3.AutoSize = true;
-            label3.Location = new Point(15, 147);
+            label3.Location = new Point(12, 109);
             label3.Name = "label3";
             label3.Size = new Size(47, 15);
             label3.TabIndex = 22;
             label3.Text = "Materia";
             // 
+            // btnEditar
+            // 
+            btnEditar.Location = new Point(113, 220);
+            btnEditar.Name = "btnEditar";
+            btnEditar.Size = new Size(75, 23);
+            btnEditar.TabIndex = 23;
+            btnEditar.Text = "Editar";
+            btnEditar.UseVisualStyleBackColor = true;
+            btnEditar.Click += btnEditar_Click;
+            // 
             // Form5
             // 
-            ClientSize = new Size(1328, 598);
+            ClientSize = new Size(1336, 582);
+            Controls.Add(btnEditar);
             Controls.Add(label3);
             Controls.Add(label2);
             Controls.Add(label1);
@@ -240,5 +252,6 @@
         private Label label1;
         private Label label2;
         private Label label3;
+        private Button btnEditar;
     }
 }

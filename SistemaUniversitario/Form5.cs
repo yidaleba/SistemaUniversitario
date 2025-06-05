@@ -9,6 +9,7 @@ namespace UniversidadApp
     public partial class Form5 : Form
     {
         private SQLiteConnection conexion;
+        private bool modoEdicion = false;
 
         public Form5()
         {
@@ -21,7 +22,6 @@ namespace UniversidadApp
             CargarSemestres();
             cargarHorarios();
             CargarMaterias();
-            dataGridViewHorario.CellClick += dataGridViewHorario_CellClick;
             dataGridViewHorario.Columns["Id"].Visible = false;
 
             // Esperar a que comboCarrera y comboSemestre estén cargados
@@ -32,7 +32,53 @@ namespace UniversidadApp
             comboCarrera.DropDownStyle = ComboBoxStyle.DropDownList;
             comboSemestre.DropDownStyle = ComboBoxStyle.DropDownList;
 
+            // Asegurarse de que las columnas de botones existan desde el inicio
+
+
+            if (!dataGridViewHorario.Columns.Contains("Eliminar"))
+            {
+                DataGridViewButtonColumn btnEliminar = new DataGridViewButtonColumn
+                {
+                    HeaderText = "Eliminar",
+                    Name = "Eliminar",
+                    Text = "Eliminar",
+                    UseColumnTextForButtonValue = true,
+                    AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
+                };
+                dataGridViewHorario.Columns.Add(btnEliminar);
+            }
+            dataGridViewHorario.CellContentClick += dataGridViewHorario_CellContentClick;
         }
+
+        private void dataGridViewHorario_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+            // Verificar que sea una fila válida y que el clic sea en un botón
+            if (e.RowIndex >= 0)
+            {
+                string columna = dataGridViewHorario.Columns[e.ColumnIndex].Name;
+
+                int idHorario = Convert.ToInt32(dataGridViewHorario.Rows[e.RowIndex].Cells["Id"].Value);
+
+                if (columna == "Eliminar")
+                {
+                    DialogResult resultado = MessageBox.Show("¿Estás seguro de eliminar este horario?", "Confirmar eliminación", MessageBoxButtons.YesNo);
+                    if (resultado == DialogResult.Yes)
+                    {
+                        EliminarHorario(idHorario);
+                        cargarHorarios(); // Recargar datos
+                    }
+                }
+            }
+        }
+
+        private void EliminarHorario(int id)
+        {
+            string query = "DELETE FROM Horarios WHERE Id = @id";
+            using var cmd = new SQLiteCommand(query, conexion);
+            cmd.Parameters.AddWithValue("@id", id);
+            cmd.ExecuteNonQuery();
+        }
+
 
         private void CrearTablaHorariosSiNoExiste()
         {
@@ -175,10 +221,13 @@ namespace UniversidadApp
             using (var conn = new SQLiteConnection("Data Source=universidad.db"))
             {
                 conn.Open();
-                string query = @"SELECT h.Id, m.Nombre AS Materia, m.Codigo, m.Carrera, m.Semestre, h.Grupo, h.CantEstudiantes, h.Dia, h.HoraInicio, h.HoraFin
-                         FROM Horarios h
-                         INNER JOIN Materias m ON h.MateriaId = m.Id
-                         WHERE 1=1"; // base de la consulta
+                string query = @"SELECT h.Id, m.Nombre AS Materia, m.Codigo, m.Carrera, m.Semestre, 
+                        h.Grupo, h.CantEstudiantes, d.Nombre || ' ' || d.Apellido AS Docente, h.Dia, h.HoraInicio, h.HoraFin
+                 FROM Horarios h
+                 INNER JOIN Materias m ON h.MateriaId = m.Id
+                 LEFT JOIN DocenteMateria dm ON m.Id = dm.MateriaId
+                 LEFT JOIN Docente d ON dm.DocenteId = d.Id
+                 WHERE 1=1"; // base de la consulta
 
                 var cmd = new SQLiteCommand();
                 cmd.Connection = conn;
@@ -212,12 +261,14 @@ namespace UniversidadApp
                     cmd.Parameters.AddWithValue("@filtro", $"%{filtroMateria}%");
                 }
 
+                query += " ORDER BY m.Codigo ASC";
                 cmd.CommandText = query;
 
                 using (var da = new SQLiteDataAdapter(cmd))
                 {
                     DataTable dt = new DataTable();
                     da.Fill(dt);
+                    dataGridViewHorario.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
                     dataGridViewHorario.DataSource = dt;
 
                     dataGridViewHorario.Columns["Materia"].HeaderText = "Materia";
@@ -226,6 +277,7 @@ namespace UniversidadApp
                     dataGridViewHorario.Columns["Semestre"].HeaderText = "Semestre";
                     dataGridViewHorario.Columns["Grupo"].HeaderText = "Grupo";
                     dataGridViewHorario.Columns["CantEstudiantes"].HeaderText = "N° Estudiantes";
+                    dataGridViewHorario.Columns["Docente"].HeaderText = "Docente";
                     dataGridViewHorario.Columns["Dia"].HeaderText = "Día";
                     dataGridViewHorario.Columns["HoraInicio"].HeaderText = "Inicio";
                     dataGridViewHorario.Columns["HoraFin"].HeaderText = "Fin";
@@ -264,43 +316,6 @@ namespace UniversidadApp
             cmd.ExecuteNonQuery();
         }
 
-       
-
-        private void dataGridViewHorario_CellClick(object sender, DataGridViewCellEventArgs e)
-        {
-            if (e.RowIndex >= 0)
-            {
-                var grid = (DataGridView)sender;
-
-                if (!dataGridViewHorario.Columns.Contains("Editar"))
-                {
-                    DataGridViewButtonColumn btnEditar = new DataGridViewButtonColumn
-                    {
-                        HeaderText = "Editar",
-                        Name = "Editar",
-                        Text = "Editar",
-                        UseColumnTextForButtonValue = true
-                    };
-                    dataGridViewHorario.Columns.Add(btnEditar);
-                }
-
-                if (!dataGridViewHorario.Columns.Contains("Eliminar"))
-                {
-                    DataGridViewButtonColumn btnEliminar = new DataGridViewButtonColumn
-                    {
-                        HeaderText = "Eliminar",
-                        Name = "Eliminar",
-                        Text = "Eliminar",
-                        UseColumnTextForButtonValue = true
-                    };
-                    dataGridViewHorario.Columns.Add(btnEliminar);
-                }
-
-            }
-        }
-
-
-
 
 
         private void btnVolver_Click(object sender, EventArgs e)
@@ -314,7 +329,7 @@ namespace UniversidadApp
         {
             // Aquí puedes poner la lógica para filtrar materias según la carrera seleccionada
             // Por ejemplo:
-          
+
             CargarMaterias();
             cargarHorarios();
         }
@@ -375,11 +390,6 @@ namespace UniversidadApp
         }
 
 
-        private void dataGridViewHorario_CellContentClick(object sender, DataGridViewCellEventArgs e)
-        {
-
-        }
-
         private void labelDia1_Click(object sender, EventArgs e)
         {
 
@@ -398,9 +408,9 @@ namespace UniversidadApp
 
         private void comboMateria_SelectedIndexChanged(object sender, EventArgs e)
         {
-            
+
             cargarHorarios();
-             
+
         }
 
 
@@ -457,9 +467,83 @@ namespace UniversidadApp
 
         private void btnAgregarHorario_Click_1(object sender, EventArgs e)
         {
-            
-                panelHorario.Visible = !panelHorario.Visible;
-          
+
+            panelHorario.Visible = !panelHorario.Visible;
+
         }
+
+        private void btnEditar_Click(object sender, EventArgs e)
+        {
+            if (!modoEdicion)
+            {
+                // Entrar en modo edición
+                dataGridViewHorario.ReadOnly = false;
+                dataGridViewHorario.AllowUserToAddRows = false; // Evita agregar nuevas filas
+                btnEditar.Text = "Guardar Cambios";
+                modoEdicion = true;
+
+                // Permitir edición solo en ciertas columnas (opcional)
+                foreach (DataGridViewColumn col in dataGridViewHorario.Columns)
+                {
+                    if (col.Name == "Id" || col.Name == "Docente") // Columnas no editables
+                        col.ReadOnly = true;
+                    else
+                        col.ReadOnly = false;
+                }
+
+                MessageBox.Show("Modo edición activado. Puedes modificar las celdas.");
+            }
+            else
+            {
+                // Guardar cambios
+                GuardarCambiosEnHorarios();
+                btnEditar.Text = "Editar";
+                modoEdicion = false;
+                dataGridViewHorario.ReadOnly = true;
+                MessageBox.Show("Cambios guardados exitosamente.");
+            }
+        }
+
+        private void GuardarCambiosEnHorarios()
+        {
+            string query = @"UPDATE Horarios SET 
+                     Dia = @Dia, HoraInicio = @HoraInicio, HoraFin = @HoraFin,
+                     Grupo = @Grupo, CantEstudiantes = @CantEstudiantes
+                     WHERE Id = @Id";
+
+            using var transaction = conexion.BeginTransaction();
+
+            try
+            {
+                foreach (DataGridViewRow fila in dataGridViewHorario.Rows)
+                {
+                    if (fila.IsNewRow) continue;
+
+                    int id = Convert.ToInt32(fila.Cells["Id"].Value);
+                    string dia = fila.Cells["Dia"].Value?.ToString() ?? "";
+                    string inicio = fila.Cells["HoraInicio"].Value?.ToString() ?? "";
+                    string fin = fila.Cells["HoraFin"].Value?.ToString() ?? "";
+                    int grupo = Convert.ToInt32(fila.Cells["Grupo"].Value);
+                    int cantEstudiantes = Convert.ToInt32(fila.Cells["CantEstudiantes"].Value);
+
+                    using var cmd = new SQLiteCommand(query, conexion, transaction);
+                    cmd.Parameters.AddWithValue("@Dia", dia);
+                    cmd.Parameters.AddWithValue("@HoraInicio", inicio);
+                    cmd.Parameters.AddWithValue("@HoraFin", fin);
+                    cmd.Parameters.AddWithValue("@Grupo", grupo);
+                    cmd.Parameters.AddWithValue("@CantEstudiantes", cantEstudiantes);
+                    cmd.Parameters.AddWithValue("@Id", id);
+                    cmd.ExecuteNonQuery();
+                }
+
+                transaction.Commit();
+            }
+            catch (Exception ex)
+            {
+                transaction.Rollback();
+                MessageBox.Show($"Error al guardar cambios: {ex.Message}");
+            }
+        }
+
     }
 }

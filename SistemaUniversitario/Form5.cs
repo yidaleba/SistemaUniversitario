@@ -48,6 +48,69 @@ namespace UniversidadApp
                 dataGridViewHorario.Columns.Add(btnEliminar);
             }
             dataGridViewHorario.CellContentClick += dataGridViewHorario_CellContentClick;
+            ConfigurarColumnaDias();
+            dataGridViewHorario.CellValidating += DataGridViewHorario_CellValidating;
+            dataGridViewHorario.EditingControlShowing += (s, e) =>
+        dataGridViewHorario_EditingControlShowing(s, e, dataGridViewHorario.CurrentCell.ColumnIndex);
+        }
+
+
+
+        private void DataGridViewHorario_CellValidating(object sender, DataGridViewCellValidatingEventArgs e)
+        {
+            string columnName = dataGridViewHorario.Columns[e.ColumnIndex].Name;
+
+            if (columnName == "Semestre" || columnName == "Grupo" || columnName == "CantEstudiantes")
+            {
+                if (!int.TryParse(e.FormattedValue.ToString(), out _))
+                {
+                    MessageBox.Show($"Solo se permiten valores numéricos en '{columnName}'.", "Error de validación", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    e.Cancel = true;
+                }
+            }
+            else if (columnName == "Inicio" || columnName == "HoraFin")
+            {
+                string hora = e.FormattedValue?.ToString() ?? "";
+                if (!string.IsNullOrWhiteSpace(hora) && !IsValidTime(hora))
+                {
+                    MessageBox.Show("Formato de hora inválido. Use HH:mm.", "Error de validación", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    e.Cancel = true;
+                }
+            }
+        }
+
+        private bool IsValidTime(string time)
+        {
+            return TimeSpan.TryParse(time, out _);
+        }
+
+        private void dataGridViewHorario_EditingControlShowing(object sender, DataGridViewEditingControlShowingEventArgs e, int columnIndex)
+        {
+            if (dataGridViewHorario.Columns[columnIndex].Name == "Inicio" ||
+                dataGridViewHorario.Columns[columnIndex].Name == "Fin")
+            {
+                e.Control.KeyPress -= ValidateOnlyNumbers;
+                e.Control.KeyPress += ValidateOnlyNumbers;
+            }
+        }
+
+        private void ValidateOnlyNumbers(object sender, KeyPressEventArgs e)
+        {
+            TextBox textBox = sender as TextBox;
+            if (e.KeyChar == (char)Keys.Back) return;
+
+            // Permitir solo números y ":"
+            if (!char.IsDigit(e.KeyChar) && e.KeyChar != ':')
+            {
+                e.Handled = true;
+            }
+
+            // Limitar formato a HH:mm
+            if (textBox.Text.Length == 2 && e.KeyChar != ':' && e.KeyChar != (char)Keys.Back)
+            {
+                textBox.Text += ":";
+                textBox.SelectionStart = textBox.Text.Length;
+            }
         }
 
         private void dataGridViewHorario_CellContentClick(object sender, DataGridViewCellEventArgs e)
@@ -288,6 +351,48 @@ namespace UniversidadApp
             }
         }
 
+        private void ConfigurarColumnaDias()
+        {
+            if (dataGridViewHorario.Columns.Contains("Dia"))
+            {
+                int indexOriginal = dataGridViewHorario.Columns["Dia"].Index;
+
+                // Eliminar solo si es de tipo texto
+                if (dataGridViewHorario.Columns["Dia"] is DataGridViewTextBoxColumn)
+                {
+                    dataGridViewHorario.Columns.RemoveAt(indexOriginal);
+
+                    var comboDia = new DataGridViewComboBoxColumn();
+                    comboDia.Name = "Dia";
+                    comboDia.HeaderText = "Día";
+                    comboDia.DataPropertyName = "Dia";
+                    comboDia.Items.AddRange(new string[] { "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo" });
+                    comboDia.DisplayStyle = DataGridViewComboBoxDisplayStyle.Nothing;
+
+                    dataGridViewHorario.Columns.Insert(indexOriginal, comboDia);
+                }
+            }
+        }
+
+        private void RestablecerColumnaDias()
+        {
+            if (dataGridViewHorario.Columns.Contains("Dia"))
+            {
+                int indexOriginal = dataGridViewHorario.Columns["Dia"].Index;
+
+                if (dataGridViewHorario.Columns["Dia"] is DataGridViewComboBoxColumn)
+                {
+                    dataGridViewHorario.Columns.RemoveAt(indexOriginal);
+
+                    var textColumn = new DataGridViewTextBoxColumn();
+                    textColumn.Name = "Dia";
+                    textColumn.HeaderText = "Día";
+                    textColumn.DataPropertyName = "Dia";
+
+                    dataGridViewHorario.Columns.Insert(indexOriginal, textColumn);
+                }
+            }
+        }
 
 
         private int ObtenerHorasMateria(int materiaId)
@@ -477,6 +582,7 @@ namespace UniversidadApp
             if (!modoEdicion)
             {
                 // Entrar en modo edición
+                ConfigurarColumnaDias();
                 dataGridViewHorario.ReadOnly = false;
                 dataGridViewHorario.AllowUserToAddRows = false; // Evita agregar nuevas filas
                 btnEditar.Text = "Guardar Cambios";
